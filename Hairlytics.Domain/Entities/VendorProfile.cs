@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hairlytics.Domain.Entities
+{
+    public class VendorProfile
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public required string ShopName { get; set; }
+        public required string ShopTelephone { get; set; }
+        public required string Description { get; set; }
+        public required string Address { get; set; }
+        public required string City { get; set;}
+        public required string Region { get; set; }
+        public required string Country { get; set;}
+        public required string PostalCode { get; set;}
+        public required string TaxNumber { get; set;}        
+        public string? Status { get; set; }        
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
+        // navigational 
+        public User? User { get; set; }
+        public ICollection<VendorDocument> Documents { get; set; } = new List<VendorDocument>();
+
+
+
+    }
+}

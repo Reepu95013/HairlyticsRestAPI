@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36623.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HairlyticsRestAPI", "HairlyticsRestAPI\HairlyticsRestAPI.csproj", "{1CBE18D0-3798-492C-9E8D-6D7F63718FA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hairlytics.Domain", "Hairlytics.Domain\Hairlytics.Domain.csproj", "{BB21B31B-E628-42F5-8D69-CE8004B5C693}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hairlytics.Application", "Hairlytics.Application\Hairlytics.Application.csproj", "{775BED4C-9620-4B59-99E7-49C82ED08C16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hairlytics.Infrastructure", "Hairlytics.Infrastructure\Hairlytics.Infrastructure.csproj", "{FADE5955-8D6F-441E-956E-04BF98FBF992}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1CBE18D0-3798-492C-9E8D-6D7F63718FA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CBE18D0-3798-492C-9E8D-6D7F63718FA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CBE18D0-3798-492C-9E8D-6D7F63718FA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CBE18D0-3798-492C-9E8D-6D7F63718FA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB21B31B-E628-42F5-8D69-CE8004B5C693}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB21B31B-E628-42F5-8D69-CE8004B5C693}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB21B31B-E628-42F5-8D69-CE8004B5C693}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB21B31B-E628-42F5-8D69-CE8004B5C693}.Release|Any CPU.Build.0 = Release|Any CPU
+		{775BED4C-9620-4B59-99E7-49C82ED08C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{775BED4C-9620-4B59-99E7-49C82ED08C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{775BED4C-9620-4B59-99E7-49C82ED08C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{775BED4C-9620-4B59-99E7-49C82ED08C16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {60008561-C954-4DB2-953B-D820C169A355}
+	EndGlobalSection
+EndGlobal
