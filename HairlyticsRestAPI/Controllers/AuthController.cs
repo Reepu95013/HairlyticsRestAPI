@@ -23,10 +23,23 @@ namespace HairlyticsRestAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserCreateDto dto)
         {
-            await _authService.RegisterUserAsync(dto);
-            return Ok("User registered successfully");
+            var result = await _authService.RegisterUserAsync(dto);
+            if (result.Success == false)
+            {
+                return BadRequest(result.Message);
+            }
+            return Created("Register",result);
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(string username, string password)
+        {
+           var tokenData =  await _authService.LoginUserAsync(username, password);
+            if (tokenData == null)
+                return Unauthorized("Invalid username or password");
+
+            return Ok(tokenData);
+        }
 
 
         // GET: api/<AuthController>

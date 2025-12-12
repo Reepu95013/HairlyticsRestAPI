@@ -16,9 +16,11 @@ namespace Hairlytics.Infrastructure.Extensions
 
             public static IServiceCollection AddApplicationServices(this IServiceCollection services)
             {
+                services.AddScoped<IJwtService, JwtService>();
                 services.AddScoped<IAuthService, AuthService>();
                 services.AddScoped<IUserService, UserService>();
                 services.AddScoped<IVendorService, VendorService>();
+
                 return services;
             }
 

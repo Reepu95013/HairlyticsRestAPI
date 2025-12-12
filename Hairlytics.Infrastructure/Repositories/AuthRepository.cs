@@ -34,5 +34,6 @@ namespace Hairlytics.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        
     }
 }

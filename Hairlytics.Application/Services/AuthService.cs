@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
+using Hairlytics.Application.ApplicationHelper;
+using Hairlytics.Application.DTOs.HelperDTOs;
+using Hairlytics.Application.DTOs.TokenDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.ServiceInterfaces;
+using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hairlytics.Domain.Enums;
 
 namespace Hairlytics.Application.Services
 {
@@ -14,21 +19,77 @@ namespace Hairlytics.Application.Services
     {
         private readonly IAuthRepository _authRepository;
         private readonly IMapper _mapper;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IJwtService _jwtService;
 
-        public AuthService(IAuthRepository authRepository, IMapper mapper)
+        public AuthService(IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService)
         {
             _authRepository = authRepository;
             _mapper = mapper;
+            _passwordHasher = passwordHasher;
+            _jwtService = jwtService;
         }
 
-        public Task LoginUserAsync(string username, string password)
+        public async Task<TokenResponseDto?> LoginUserAsync(string username, string password)
         {
-            throw new NotImplementedException();
+
+           var user  =  await _authRepository.GetByUsernameAsync(username);
+            if (user == null)
+            {
+                return null;
+            }
+
+            bool isPasswordCorrect = _passwordHasher.VerifyPassword(password, user.Password);
+            if (!isPasswordCorrect) {
+                return null;
+            }
+
+         string toeken = _jwtService.GenerateToken(user);
+
+            return new TokenResponseDto
+            {
+                Expiration = DateTime.UtcNow,
+                Token = toeken
+            };
+
         }
 
-        public Task RegisterUserAsync(UserCreateDto dto)
+        public async Task<ServiceResponse<UserResponseDto?>> RegisterUserAsync(UserCreateDto dto)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<UserResponseDto?>();
+
+            var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
+            if (existingUser != null)
+            {
+                response.Success = false;
+                response.Message = "Username already exists.";
+                return response;
+            }
+
+            if (existingUser?.Role == UserRole.Admin) {
+                response.Success = false;
+                response.Message = "You have not permission!";
+                return response;
+            }
+
+            string hashedPassword = _passwordHasher.HashPassword(dto.Password);
+
+            dto.Password = hashedPassword;
+            dto.CreatedAt = DateTime.Now;
+            dto.UpdatedAt = DateTime.Now;
+
+           var newUser = _mapper.Map<User>(dto);
+
+           await _authRepository.CreateUserAsync(newUser);
+           await _authRepository.SaveChangesAsync();
+
+            var user = _mapper.Map<UserResponseDto>(newUser);
+
+            response.Data = user;
+            response.Success = true;
+            response.Message = "Your Account has been Created Successfully!";
+
+           return response;
         }
     }
 }

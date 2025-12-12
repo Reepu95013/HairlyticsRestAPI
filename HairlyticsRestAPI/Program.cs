@@ -1,4 +1,5 @@
-﻿using Hairlytics.Application.Mapping;
+﻿using Hairlytics.Application.ApplicationHelper;
+using Hairlytics.Application.Mapping;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Application.Services;
 using Hairlytics.Domain.Interfaces;
@@ -30,19 +31,14 @@ option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureRepository();
 
-
+// add helper class and interface
+builder.Services.AddSingleton<IPasswordHasher>(sp => new BcryptPasswordHasher(workFactor: 12));
 
 // ✅ AutoMapper (Clean Architecture)
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 //JWT Service
 builder.Services.AddAuthorization();
-
-
-
-
-
-
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
