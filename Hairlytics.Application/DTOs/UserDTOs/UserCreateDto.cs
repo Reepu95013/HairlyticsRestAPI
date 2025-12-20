@@ -1,4 +1,4 @@
-﻿using Hairlytics.Domain.Entities;
+﻿using Hairlytics.Application.DTOs.VendorProfileDTOs;
 using Hairlytics.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,6 @@ namespace Hairlytics.Application.DTOs.UserDTOs
         public DateTime? UpdatedAt { get; set; }
 
         //navigational
-        public VendorProfile? VendorProfile { get; set; }
+        public VendorProfileCreateDto? VendorProfileCreateDto { get; set; }
     }
 }

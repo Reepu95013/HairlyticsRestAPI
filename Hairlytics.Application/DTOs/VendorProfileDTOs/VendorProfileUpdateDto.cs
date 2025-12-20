@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hairlytics.Application.DTOs.VendorProfileDTOs
 {
-    internal class VendorProfileUpdateDto
+    public class VendorProfileUpdateDto
     {
     }
 }

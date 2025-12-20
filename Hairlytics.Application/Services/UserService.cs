@@ -14,14 +14,24 @@ namespace Hairlytics.Application.Services
 {
     public class UserService : IUserService
     {
-        //private readonly IAuthRepository  _authRepository;
-        //private readonly IMapper _mapper;
+        private readonly IAuthRepository  _authRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        //public UserService (IAuthRepository authRepository, IMapper mapper)
-        //{
-        //    _authRepository = authRepository;
-        //    _mapper = mapper;
-        //}
-       
+        public UserService(IAuthRepository authRepository,IUserRepository userRepository, IMapper mapper)
+        {
+            _authRepository = authRepository;
+            _userRepository = userRepository;
+            _mapper = mapper;
+
+        }
+
+        public async Task<IEnumerable<UserResponseDto>>GetUsersAsync()
+        {
+           var user = await _userRepository.GetUsersAsync();
+
+            var users =  _mapper.Map<IEnumerable<UserResponseDto>>(user);
+            return users;
+        }
     }
 }

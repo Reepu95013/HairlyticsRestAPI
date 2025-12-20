@@ -1,5 +1,7 @@
 ﻿using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Interfaces;
+using Hairlytics.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,34 +12,15 @@ namespace Hairlytics.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        public Task CreateAsync(User user)
-        {
-            throw new NotImplementedException();
+        private readonly ApplicationDbContext _context;
+        public UserRepository(ApplicationDbContext context) { 
+        
+            _context = context;
         }
 
-        public Task DeleteAsync(string id)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<IEnumerable<User>>GetUsersAsync() {
 
-        public Task<List<User>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<User> GetByEmailAsync(string email)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<User> GetByIdAsync(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(User user)
-        {
-            throw new NotImplementedException();
+            return await _context.Users.Include(u => u.VendorProfile).AsNoTracking().ToListAsync();
         }
     }
 }

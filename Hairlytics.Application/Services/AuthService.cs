@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hairlytics.Domain.Enums;
+using Hairlytics.Application.DTOs.VendorProfileDTOs;
 
 namespace Hairlytics.Application.Services
 {
@@ -44,12 +45,12 @@ namespace Hairlytics.Application.Services
                 return null;
             }
 
-         string toeken = _jwtService.GenerateToken(user);
+         string token = _jwtService.GenerateToken(user);
 
             return new TokenResponseDto
             {
                 Expiration = DateTime.UtcNow,
-                Token = toeken
+                Token = token
             };
 
         }
@@ -80,10 +81,43 @@ namespace Hairlytics.Application.Services
 
            var newUser = _mapper.Map<User>(dto);
 
+            if (dto.Role == UserRole.Vendor)
+            {
+                if (dto.VendorProfileCreateDto == null)
+                {
+                    response.Success = false;
+                    response.Message = "Vendor profile is required!";
+                    return response;
+                }
+                    
+               
+                var vendorProfile = _mapper.Map<VendorProfile>(dto.VendorProfileCreateDto);
+                vendorProfile.CreatedAt = DateTime.Now;
+                vendorProfile.UpdatedAt = DateTime.Now;
+
+                if (dto.VendorProfileCreateDto.VendorDocumentCreateDto != null)
+                {
+                    foreach (var docDto in dto.VendorProfileCreateDto.VendorDocumentCreateDto)
+                    {
+                        var document = _mapper.Map<VendorDocument>(docDto);
+                        document.CreatedAt = DateTime.Now;
+                        document.UpdatedAt = DateTime.Now;
+                        vendorProfile.Documents.Add(document);
+                    }
+                }
+
+                newUser.VendorProfile = vendorProfile;
+
+            }
+
+            
+
            await _authRepository.CreateUserAsync(newUser);
            await _authRepository.SaveChangesAsync();
 
             var user = _mapper.Map<UserResponseDto>(newUser);
+           
+
 
             response.Data = user;
             response.Success = true;

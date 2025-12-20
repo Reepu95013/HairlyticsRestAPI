@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Hairlytics.Application.DTOs.VendorDocumentDTOs
 {
-    internal class VendorDocumentCreateDto
+    public class VendorDocumentCreateDto
     {
+        public required string DocumentType { get; set; }
+        public required string FilePath { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+
     }
 }

@@ -39,7 +39,7 @@ namespace Hairlytics.Application.Mapping
 
             // Create DTO → Entity
             CreateMap<VendorProfileCreateDto, VendorProfile>();
-
+           
             // Update DTO → Entity
             CreateMap<VendorProfileUpdateDto, VendorProfile>();
 
@@ -48,7 +48,7 @@ namespace Hairlytics.Application.Mapping
             // VENDOR DOCUMENT MAPPINGS 
             // =========================
 
-            CreateMap<VendorDocument, VendorDocumentResponseDto>();
+            CreateMap<VendorDocument, VendorDocumentResponseDto>();           
             CreateMap<VendorDocumentCreateDto, VendorDocument>();
 
         }

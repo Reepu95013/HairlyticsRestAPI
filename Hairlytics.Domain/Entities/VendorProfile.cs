@@ -25,9 +25,7 @@ namespace Hairlytics.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
 
         // navigational 
-        public User? User { get; set; }
-        public ICollection<VendorDocument> Documents { get; set; } = new List<VendorDocument>();
-
+       public ICollection<VendorDocument> Documents { get; set; } = new List<VendorDocument>();
 
 
     }

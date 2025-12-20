@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hairlytics.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251206022329_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251220075026_initialaddtables")]
+    partial class initialaddtables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,13 +185,11 @@ namespace Hairlytics.Infrastructure.Migrations
 
             modelBuilder.Entity("Hairlytics.Domain.Entities.VendorProfile", b =>
                 {
-                    b.HasOne("Hairlytics.Domain.Entities.User", "User")
+                    b.HasOne("Hairlytics.Domain.Entities.User", null)
                         .WithOne("VendorProfile")
                         .HasForeignKey("Hairlytics.Domain.Entities.VendorProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Hairlytics.Domain.Entities.User", b =>
