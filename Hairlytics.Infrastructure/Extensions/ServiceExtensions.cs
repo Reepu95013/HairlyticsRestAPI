@@ -20,6 +20,7 @@ namespace Hairlytics.Infrastructure.Extensions
                 services.AddScoped<IAuthService, AuthService>();
                 services.AddScoped<IUserService, UserService>();
                 services.AddScoped<IVendorService, VendorService>();
+                services.AddScoped<IEmailService, EmailService>();
 
                 return services;
             }

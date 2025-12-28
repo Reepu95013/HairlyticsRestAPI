@@ -32,9 +32,9 @@ namespace HairlyticsRestAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login([FromForm] LoginDto loginDto)
         {
-           var tokenData =  await _authService.LoginUserAsync(username, password);
+           var tokenData =  await _authService.LoginUserAsync(loginDto.Username, loginDto.Password);
             if (tokenData == null)
                 return Unauthorized("Invalid username or password");
 
