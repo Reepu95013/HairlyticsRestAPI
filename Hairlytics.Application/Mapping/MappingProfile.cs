@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairlytics.Application.DTOs.CategoryDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.DTOs.VendorDocumentDTOs;
 using Hairlytics.Application.DTOs.VendorProfileDTOs;
@@ -50,6 +51,15 @@ namespace Hairlytics.Application.Mapping
 
             CreateMap<VendorDocument, VendorDocumentResponseDto>();           
             CreateMap<VendorDocumentCreateDto, VendorDocument>();
+
+
+            // create category DTO to Category 
+
+            CreateMap<CreateCategoryDto, Category>();
+
+            // Get category to response category dto
+            CreateMap<Category, ResponseCategoryDto>();
+
 
         }
 

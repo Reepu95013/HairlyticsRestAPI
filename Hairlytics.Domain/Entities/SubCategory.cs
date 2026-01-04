@@ -14,7 +14,7 @@ namespace Hairlytics.Domain.Entities
         public int CategoryId { get; set; }
         public string? ImageUrl { get; set; }       
         public int? VendorProfileId { get; set; }
-        public bool IsGlobal { get; set; } = false;
+        public bool IsGlobal { get; set; } 
         public bool IsActive { get; set; } 
         public bool IsDeleted { get; set; }
         public DateTime CreateAt { get; set; }
