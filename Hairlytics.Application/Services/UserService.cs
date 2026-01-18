@@ -26,6 +26,12 @@ namespace Hairlytics.Application.Services
 
         }
 
+        public async Task<UserResponseDto> GetUserAsync(int UserId)
+        {
+            var user = await _userRepository.GetUserAsync(UserId);  
+            return _mapper.Map<UserResponseDto>(user);
+        }
+
         public async Task<IEnumerable<UserResponseDto>>GetUsersAsync()
         {
            var user = await _userRepository.GetUsersAsync();

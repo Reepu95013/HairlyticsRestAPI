@@ -18,6 +18,11 @@ namespace Hairlytics.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<User> GetUserAsync(int UserId)
+        {
+            return await _context.Users.FirstAsync(u=>u.Id == UserId);
+        }
+
         public async Task<IEnumerable<User>>GetUsersAsync() {
 
             return await _context.Users.Include(u => u.VendorProfile).AsNoTracking().ToListAsync();

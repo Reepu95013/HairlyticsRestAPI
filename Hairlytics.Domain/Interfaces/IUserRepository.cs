@@ -10,5 +10,6 @@ namespace Hairlytics.Domain.Interfaces
     public interface IUserRepository
     {
         Task<IEnumerable<User>>GetUsersAsync();
+        Task<User> GetUserAsync(int UserId);
     }
 }

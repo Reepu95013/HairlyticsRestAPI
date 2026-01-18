@@ -1,5 +1,4 @@
 ﻿using Hairlytics.Application.DTOs.HelperDTOs;
-using Hairlytics.Application.DTOs.TokenDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,9 @@ namespace Hairlytics.Application.ServiceInterfaces
     public interface IAuthService
     {
         
-        Task<ServiceResponse<UserResponseDto?>> RegisterUserAsync(UserCreateDto dto);
-        Task<TokenResponseDto?> LoginUserAsync(string username, string password);
+        Task<ServiceResponse<TokenResponseDto>> RegisterUserAsync(UserCreateDto dto);
+        Task<ServiceResponse<TokenResponseDto>> LoginUserAsync(string username, string password);
+        Task<ServiceResponse<TokenResponseDto?>> RefreshTokenAsync(int userId, string refreshToken);
 
     }
 }

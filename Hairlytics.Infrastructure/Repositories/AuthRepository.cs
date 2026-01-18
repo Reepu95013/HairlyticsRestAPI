@@ -1,4 +1,5 @@
-﻿using Hairlytics.Domain.Entities;
+﻿using Hairlytics.Application.ApplicationHelper;
+using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,37 @@ namespace Hairlytics.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        
+        public async Task CreateRefreshToken(RefreshToken refreshToken)
+        {
+            if (refreshToken.UserId!=0)
+            {
+                var oldTokens = await _context.RefreshTokens
+                .Where(x => x.UserId == refreshToken.UserId && !x.IsRevoked)
+                .ToListAsync();
+
+                foreach (var token in oldTokens)
+                {
+                    token.IsRevoked = true;
+                    token.ExpiryDate = DateTime.Now;
+                }
+            }
+           await _context.RefreshTokens.AddAsync(refreshToken);
+           await _context.SaveChangesAsync();
+        }
+
+        public async Task<RefreshToken?> RefreshToken(int userId, string refreshToken)
+        {
+            var token = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.UserId==userId && x.Token==refreshToken && !x.IsRevoked && x.ExpiryDate > DateTime.Now);
+
+            if (token == null)
+            {
+                return null;
+            }
+
+            token.ExpiryDate = DateTime.Now.AddDays(7);
+            await _context.SaveChangesAsync();   
+            
+            return token;
+        }
     }
 }

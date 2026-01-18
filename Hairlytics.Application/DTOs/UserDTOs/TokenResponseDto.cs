@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hairlytics.Application.DTOs.TokenDTOs
+namespace Hairlytics.Application.DTOs.UserDTOs
 {
     public class TokenResponseDto
     {
         public string? Token { get; set; }
-        public DateTime Expiration { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }

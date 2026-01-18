@@ -56,8 +56,9 @@ namespace Hairlytics.Application.Services
             var key = Encoding.ASCII.GetBytes("V3ryL0ngAndC0mpl3xS3cr3tK3y256df");
             var identity = new ClaimsIdentity(new Claim[]
             {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim(ClaimTypes.Name, user.Name)
+                new Claim(ClaimTypes.Name, user.Username)
             });
 
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
@@ -65,7 +66,7 @@ namespace Hairlytics.Application.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddMinutes(1),
                 SigningCredentials = credentials,
                 Issuer= _config["Jwt:Issuer"],
                 Audience= _config["Jwt:Audience"],

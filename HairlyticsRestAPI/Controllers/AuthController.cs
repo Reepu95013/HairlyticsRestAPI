@@ -35,9 +35,21 @@ namespace HairlyticsRestAPI.Controllers
         public async Task<IActionResult> Login([FromForm] LoginDto loginDto)
         {
            var tokenData =  await _authService.LoginUserAsync(loginDto.Username, loginDto.Password);
-            if (tokenData == null)
-                return Unauthorized("Invalid username or password");
+            if (tokenData.Success==false)
+                return Unauthorized(tokenData.Message);
 
+            return Ok(tokenData);
+        }
+
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenDto dto)
+        {
+            var tokenData = await _authService.RefreshTokenAsync(dto.UserId, dto.RefreshToken); 
+            if (tokenData.Success==false)
+            {
+                return BadRequest(tokenData.Message);
+            }
             return Ok(tokenData);
         }
 
