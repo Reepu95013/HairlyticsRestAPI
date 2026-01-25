@@ -26,6 +26,11 @@ namespace Hairlytics.Application.Services
 
         }
 
+        public async Task<bool> CheckEmailExitsAsync(string email)
+        {
+            return await _userRepository.CheckEmailExitsAsync(email);
+        }
+
         public async Task<UserResponseDto> GetUserAsync(int UserId)
         {
             var user = await _userRepository.GetUserAsync(UserId);  

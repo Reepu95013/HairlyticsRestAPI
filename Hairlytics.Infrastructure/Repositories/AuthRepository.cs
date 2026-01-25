@@ -2,6 +2,7 @@
 using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace Hairlytics.Infrastructure.Repositories
 
         public async Task CreateUserAsync(User user)
         {
-           await _context.Users.AddAsync(user);
+            await _context.Users.AddAsync(user);
         }
 
         public async Task SaveChangesAsync()

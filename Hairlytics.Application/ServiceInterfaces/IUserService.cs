@@ -12,5 +12,6 @@ namespace Hairlytics.Application.ServiceInterfaces
        
         Task<IEnumerable<UserResponseDto>>GetUsersAsync();
         Task<UserResponseDto> GetUserAsync(int UserId);
+        Task<bool> CheckEmailExitsAsync(string email);
     }
 }

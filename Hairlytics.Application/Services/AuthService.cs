@@ -2,16 +2,17 @@
 using Hairlytics.Application.ApplicationHelper;
 using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
+using Hairlytics.Application.DTOs.VendorProfileDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Hairlytics.Domain.Enums;
-using Hairlytics.Application.DTOs.VendorProfileDTOs;
 
 namespace Hairlytics.Application.Services
 {
@@ -133,12 +134,32 @@ namespace Hairlytics.Application.Services
             // declare retun type 
             var response = new ServiceResponse<TokenResponseDto>();
 
+            if (!new EmailAddressAttribute().IsValid(dto.Email))
+            {
+                response.Success = false;
+                response.Message = "Invalid email address";
+                return response;
+            }
+
+
+            bool emailexit = await _userRepository.CheckEmailExitsAsync(dto.Email);
+
+            if (emailexit)
+            {
+                response.Success = false;
+                response.Message = "Email already exists , try with another eamil!";
+                return response;
+            }
+
+
+            
+
             // check user exit or not
             var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
             if (existingUser != null)
             {
                 response.Success = false;
-                response.Message = "Username already exists.";
+                response.Message = "Username already exists.";               
             }
             else
             {
@@ -187,14 +208,9 @@ namespace Hairlytics.Application.Services
                             newUser.VendorProfile = vendorProfile;
 
                         }
-
-                        await _authRepository.CreateUserAsync(newUser);
-
-
-
                     }
 
-                   
+                    await _authRepository.CreateUserAsync(newUser);
 
 
                     // refresh token creating
