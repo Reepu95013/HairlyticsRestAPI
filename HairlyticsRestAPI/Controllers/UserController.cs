@@ -10,9 +10,9 @@ using System.Data;
 
 namespace HairlyticsRestAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
-    public class UserController : ControllerBase
+   public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
@@ -22,10 +22,18 @@ namespace HairlyticsRestAPI.Controllers
         }
 
         [Authorize(Roles = nameof(UserRole.Vendor))]
-        [HttpGet]
+        [HttpGet("users")]
         public async Task<IActionResult> GetUsers() {
            var users = await _userService.GetUsersAsync();
 
+            return Ok(users);
+        }
+
+        [Authorize]
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUser(int userId)
+        {
+            var users = await _userService.GetUserAsync(userId);
             return Ok(users);
         }
 

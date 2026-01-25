@@ -143,7 +143,7 @@ namespace Hairlytics.Application.Services
             else
             {
                 // validate role
-                if (existingUser?.Role == UserRole.Admin)
+                if (dto.Role == UserRole.Admin || dto.Role == UserRole.SubAdmin)
                 {
                     response.Success = false;
                     response.Message = "You have not permission!";
