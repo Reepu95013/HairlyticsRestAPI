@@ -1,12 +1,13 @@
 ﻿using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace HairlyticsRestAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -54,36 +55,43 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
-        // GET: api/<AuthController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordDto forgotPasswordDto)
         {
-            return new string[] { "value1", "value2" };
+           var data =  await _authService.ForgortPasswordAsync(forgotPasswordDto.Username);
+
+            if(data.Success == false)
+            {
+                return BadRequest(data.Message);
+            } 
+
+            return Ok(data);
         }
 
-        // GET api/<AuthController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
-            return "value";
+            var data = await _authService.ResetPasswordAsync(resetPasswordDto);
+            if(data.Success == false)
+            {
+               return BadRequest(data.Message);
+            }
+
+            return Ok(data);
         }
 
-        // POST api/<AuthController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
 
-        // PUT api/<AuthController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
         {
-        }
+            var data = await _authService.ChangePasswordAsync(changePasswordDto);
+            if (data.Success == false)
+            {
+                return BadRequest(data.Message);
+            }
 
-        // DELETE api/<AuthController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+            return Ok(data);
+        }        
     }
 }

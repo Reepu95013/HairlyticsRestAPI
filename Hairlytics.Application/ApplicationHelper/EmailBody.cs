@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hairlytics.Application.DTOs.HelperDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,15 @@ namespace Hairlytics.Application.ApplicationHelper
         public static string EmailStringBody(string email)
         {
 
-            return $@"<html>
-
-            <head></head>
-            <body>
-                <h1>hello world this message form Hairlytics {email} </h1>
-            </body
-                
-            </html
-
-
-            ";
-
+                return $@"
+                <!DOCTYPE html>
+                <html>
+                <body>
+                    <p>Hello,</p>
+                    <p>{email}</p>
+                    <p>Thanks,<br/>Hairlytics Team</p>
+                </body>
+                </html>";            
         }
     }
 }

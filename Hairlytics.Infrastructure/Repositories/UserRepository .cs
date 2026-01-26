@@ -24,6 +24,12 @@ namespace Hairlytics.Infrastructure.Repositories
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
+        }
+
         public async Task<User> GetUserAsync(int UserId)
         {
             return await _context.Users.FirstAsync(u=>u.Id == UserId);

@@ -31,6 +31,8 @@ namespace Hairlytics.Application.Services
                 Text = string.Format(emailDto.Body)
             };
 
+            
+
 
             using (var client = new SmtpClient()) {
                 try

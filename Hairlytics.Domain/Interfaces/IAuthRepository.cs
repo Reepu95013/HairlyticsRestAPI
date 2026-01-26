@@ -13,8 +13,10 @@ namespace Hairlytics.Domain.Interfaces
         Task<User?> GetByUsernameAsync(string username);
         Task CreateUserAsync(User user);
         Task CreateRefreshToken(RefreshToken refreshToken);
-        Task SaveChangesAsync();  
-        
+        Task SaveChangesAsync();          
         Task<RefreshToken?> RefreshToken (int userId, string refreshToken);
+        Task ForgotPassword(ForgotPassword forgotPassword);
+        Task<ForgotPassword?> GetResetPasswordData(string email);
+        //Task<bool> GetVerifyOTP();
     }
 }

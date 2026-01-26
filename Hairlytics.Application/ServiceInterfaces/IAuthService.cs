@@ -14,6 +14,10 @@ namespace Hairlytics.Application.ServiceInterfaces
         Task<ServiceResponse<TokenResponseDto>> RegisterUserAsync(UserCreateDto dto);
         Task<ServiceResponse<TokenResponseDto>> LoginUserAsync(string username, string password);
         Task<ServiceResponse<TokenResponseDto?>> RefreshTokenAsync(int userId, string refreshToken);
+        Task<ServiceResponse<string>> ForgortPasswordAsync(string username);
+        Task<ServiceResponse<string>> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
+
+        Task<ServiceResponse<string>> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
 
     }
 }

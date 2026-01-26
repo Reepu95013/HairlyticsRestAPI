@@ -68,5 +68,27 @@ namespace Hairlytics.Infrastructure.Repositories
             
             return token;
         }
+
+        public async Task ForgotPassword(ForgotPassword forgotPassword)
+        {
+           
+                var oldEntry = await _context.ForgotPassword
+                .Where(x => x.Email ==  forgotPassword.Email && !x.Revoke)
+                .ToListAsync();
+
+                foreach (var entry in oldEntry)
+                {
+                    entry.Revoke = true;                  
+                }
+                await _context.ForgotPassword.AddAsync(forgotPassword);
+                await _context.SaveChangesAsync();
+        }
+
+        public async Task<ForgotPassword?> GetResetPasswordData(string email)
+        {
+            var data = await _context.ForgotPassword
+                .FirstOrDefaultAsync(u => u.Email == email && !u.Revoke);
+            return data;
+        }
     }
 }
