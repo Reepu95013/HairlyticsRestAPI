@@ -20,13 +20,15 @@ namespace Hairlytics.Domain.Entities
         public required string Country { get; set;}
         public required string PostalCode { get; set;}
         public required string TaxNumber { get; set;}        
-        public string? Status { get; set; }        
+        public bool Status { get; set; }        
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        // navigational 
-       public ICollection<VendorDocument> Documents { get; set; } = new List<VendorDocument>();
-
+        // 🔗 Navigation
+        public ICollection<VendorDocument> Documents { get; set; } = new List<VendorDocument>();      
+        public User? User { get; set; }
+        public ICollection<Service> Services { get; set; } = new List<Service>();
+     
 
     }
 }

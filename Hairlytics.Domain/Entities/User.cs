@@ -24,6 +24,8 @@ namespace Hairlytics.Domain.Entities
 
         //navigational
         public VendorProfile? VendorProfile { get; set; }
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     }
 }

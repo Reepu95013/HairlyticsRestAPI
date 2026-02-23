@@ -9,18 +9,19 @@ namespace Hairlytics.Domain.Entities
     public class Category
     {
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public string? Description { get; set; }
-        public string? ImageUrl { get; set; }
-        public int? VendorProfileId { get; set; }
-        public bool IsDeleted { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsGlobal { get; set; }
-        public DateTime CreateAt { get; set; } 
-        public DateTime UpdateAt { get; set; }
+        public required string CategoryName { get; set; }
+        public required string Image { get; set; }
+        public int? ParentCategoryId { get; set; }
+        public required string Description { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public bool Status { get; set; }
+        public int UserId { get; set; }
 
-        public ICollection<SubCategory> SubCategories { get; set; } = new List<SubCategory>();
+        // 🔗 Navigation
+        public User? User { get; set; }
 
-
+        public Category? ParentCategory { get; set; }
+        public ICollection<Category> SubCategories { get; set; } = new List<Category>();
     }
 }

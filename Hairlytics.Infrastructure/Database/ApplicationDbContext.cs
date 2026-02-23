@@ -15,13 +15,17 @@ namespace Hairlytics.Infrastructure.Database
 
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<VendorProfile> VendorProfiles { get; set; }
         public DbSet<VendorDocument> VendorDocuments { get; set; }
         public DbSet<Category> Category { get; set; }
-        public DbSet<SubCategory> SubCategories { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ForgotPassword> ForgotPassword { get; set; }
 

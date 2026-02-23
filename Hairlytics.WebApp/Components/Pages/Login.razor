@@ -1,0 +1,84 @@
+﻿@page "/Admin/Login"
+
+<PageTitle>Login</PageTitle>
+
+<div class="login-container">
+        <div class="login-card">
+            <!-- LEFT SIDE – dark panel with salon branding (matches dashboard sidebar exactly) -->
+            <div class="login-side">
+                <div>
+                    <div class="brand">
+                        <i class="fas fa-cut"></i> 
+                        <span>Salon<span style="color:#d4a373;">X</span></span>
+                    </div>
+                    <div class="quote">
+                        “Effortless employee & feature control”
+                        <small>seamless access, just like your dashboard</small>
+                    </div>
+                </div>
+                <ul class="feature-list">
+                    <li><i class="fas fa-user-tie"></i> Manage employees & roles</li>
+                    <li><i class="fas fa-star"></i> Toggle salon features</li>
+                    <li><i class="fas fa-shield-alt"></i> Granular access levels</li>
+                    <li><i class="fas fa-calendar-check"></i> Appointment overview</li>
+                </ul>
+                <div class="mt-4">
+                    <span class="badge-salon"><i class="fas fa-spa me-2"></i>Glow salon admin</span>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE – login form (matches dashboard cards / section-card style) -->
+            <div class="login-form-panel">
+                <div class="login-header">
+                    <h2>Welcome back</h2>
+                    <p>Sign in to manage your salon dashboard</p>
+                </div>
+
+                <!-- login form (no actual submit, just demo) -->
+                <form>
+                    <div class="input-group-custom">
+                        <span><i class="far fa-envelope"></i></span>
+                        <input type="email" placeholder="Email address" value="admin@glowsalon.com" required>
+                    </div>
+                    <div class="input-group-custom">
+                        <span><i class="fas fa-lock"></i></span>
+                        <input type="password" placeholder="Password" value="••••••••" required>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberCheck" checked>
+                            <label class="form-check-label" for="rememberCheck" style="color:#334155;">
+                                Keep me signed in
+                            </label>
+                        </div>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-arrow-right-to-bracket me-2"></i> Sign in to dashboard
+                    </button>
+
+                    <div class="text-center mt-4 register-badge">
+                        <span>🔐 demo credentials — click sign in</span>
+                    </div>
+                    <hr class="my-4">
+                    <div class="text-center text-secondary small">
+                        <i class="fas fa-shield me-1"></i> secure admin access · v2.0
+                    </div>
+                </form>
+
+                <!-- hint: quick role cards (just for style) -->
+                <div class="d-flex gap-2 mt-4 pt-2">
+                    <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-user-tie"></i></span>
+                    <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-cut"></i></span>
+                    <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-cog"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+@code {
+
+}

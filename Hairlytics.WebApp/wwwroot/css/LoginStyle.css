@@ -1,0 +1,196 @@
+﻿/* additional custom login layout (blends perfectly with above) */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background-color: #f4f7fc; /* matches dashboard body */
+}
+
+.login-card {
+    background: white;
+    border-radius: 48px;
+    box-shadow: 0 25px 45px -12px rgba(26, 48, 73, 0.2);
+    overflow: hidden;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #eef2f6;
+}
+
+.login-side {
+    background: linear-gradient(180deg, #1e2a3a 0%, #15232e 100%);
+    color: #e0e9f0;
+    flex: 1 1 45%;
+    padding: 3.2rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+    .login-side .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 3rem;
+    }
+
+        .login-side .brand i {
+            color: #d4a373;
+            font-size: 3rem;
+            background: rgba(255,255,255,0.02);
+            padding: 12px;
+            border-radius: 24px;
+        }
+
+    .login-side .quote {
+        font-size: 1.7rem;
+        font-weight: 500;
+        line-height: 1.3;
+        margin-bottom: 2rem;
+    }
+
+        .login-side .quote small {
+            font-size: 1rem;
+            color: #a5b9ce;
+            display: block;
+            margin-top: 1.2rem;
+            font-weight: 350;
+        }
+
+    .login-side .feature-list {
+        list-style: none;
+        padding: 0;
+        margin-top: auto;
+    }
+
+        .login-side .feature-list li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #2f3f4f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .login-side .feature-list i {
+            color: #d4a373;
+            width: 28px;
+            font-size: 1.3rem;
+        }
+
+.login-form-panel {
+    flex: 1 1 55%;
+    padding: 3.5rem 3rem;
+    background: white;
+}
+
+.login-header {
+    margin-bottom: 2.2rem;
+}
+
+    .login-header h2 {
+        font-weight: 650;
+        color: #1e2f40;
+        font-size: 2rem;
+    }
+
+    .login-header p {
+        color: #566f84;
+    }
+
+.input-group-custom {
+    background: #f8fafd;
+    border-radius: 60px;
+    border: 1px solid #e9edf2;
+    transition: 0.15s;
+    padding: 0.2rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.4rem;
+}
+
+    .input-group-custom:focus-within {
+        border-color: #d4a373;
+        box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2);
+    }
+
+    .input-group-custom span {
+        background: transparent;
+        border: none;
+        color: #8899a8;
+        font-size: 1.2rem;
+        padding-left: 1.2rem;
+        padding-right: 0.5rem;
+    }
+
+    .input-group-custom input {
+        border: none;
+        background: transparent;
+        padding: 0.9rem 0.9rem 0.9rem 0.2rem;
+        width: 100%;
+        outline: none;
+        font-weight: 450;
+    }
+
+.form-check-input:checked {
+    background-color: #1e2a3a;
+    border-color: #1e2a3a;
+}
+
+.btn-login {
+    background: #1e2a3a;
+    border: none;
+    border-radius: 60px;
+    padding: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: white;
+    width: 100%;
+    transition: 0.2s;
+    margin: 1.5rem 0 1rem;
+}
+
+    .btn-login:hover {
+        background: #14222e;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -8px #1e2a3a80;
+    }
+
+.forgot-link {
+    color: #566f84;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+    .forgot-link:hover {
+        color: #1e2a3a;
+        text-decoration: underline;
+    }
+
+.register-badge {
+    background: #f4f7fc;
+    border-radius: 40px;
+    padding: 0.9rem 1.5rem;
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+    .register-badge a {
+        color: #1e2a3a;
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 2px solid #d4a373;
+    }
+
+        .register-badge a:hover {
+            color: #d4a373;
+        }
+
+hr {
+    opacity: 0.2;
+}

@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hairlytics.Application", "H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hairlytics.Infrastructure", "Hairlytics.Infrastructure\Hairlytics.Infrastructure.csproj", "{FADE5955-8D6F-441E-956E-04BF98FBF992}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hairlytics.WebApp", "Hairlytics.WebApp\Hairlytics.WebApp.csproj", "{4BFD878A-7729-4642-9B79-83009A71E20A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileStorage", "FileStorage", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,10 @@ Global
 		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FADE5955-8D6F-441E-956E-04BF98FBF992}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BFD878A-7729-4642-9B79-83009A71E20A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BFD878A-7729-4642-9B79-83009A71E20A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BFD878A-7729-4642-9B79-83009A71E20A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BFD878A-7729-4642-9B79-83009A71E20A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,6 +18,8 @@ namespace Hairlytics.Domain.Entities
 
         public VendorProfile? VendorProfile { get; set; }
 
+       
+
     }
 
 }

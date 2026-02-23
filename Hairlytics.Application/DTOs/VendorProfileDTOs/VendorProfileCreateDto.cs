@@ -18,7 +18,7 @@ namespace Hairlytics.Application.DTOs.VendorProfileDTOs
         public required string Country { get; set; }
         public required string PostalCode { get; set; }
         public required string TaxNumber { get; set; }
-        public string? Status { get; set; }
+        public bool Status { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
