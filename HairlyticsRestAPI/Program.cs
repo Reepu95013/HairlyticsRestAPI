@@ -30,6 +30,7 @@ option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureRepository();
+builder.Services.AddHttpContextAccessor();
 
 // add helper class and interface
 builder.Services.AddSingleton<IPasswordHasher>(sp => new BcryptPasswordHasher(workFactor: 12));

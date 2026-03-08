@@ -37,6 +37,9 @@ namespace Hairlytics.Application.Services
             using (var client = new SmtpClient()) {
                 try
                 {
+                    client.CheckCertificateRevocation = false;
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
                     client.Connect(_config["EmailSettings:SmtpServer"], 465, true);
                     client.Authenticate(_config["EmailSettings:Username"], _config["EmailSettings:Password"]);
                     client.Send(emailMessage);

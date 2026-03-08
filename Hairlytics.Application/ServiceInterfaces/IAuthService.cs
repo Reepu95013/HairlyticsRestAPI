@@ -19,5 +19,8 @@ namespace Hairlytics.Application.ServiceInterfaces
 
         Task<ServiceResponse<string>> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
 
+        Task<UserLoginDto?> LoginAdminAsync(LoginDto request);
+        //Task LogoutAsync();
+
     }
 }

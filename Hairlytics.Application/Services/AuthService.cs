@@ -7,10 +7,14 @@ using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,8 +28,9 @@ namespace Hairlytics.Application.Services
         private readonly IJwtService _jwtService;
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
+       
 
-        public AuthService(IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService, IUserRepository userRepository, IEmailService emailService)
+        public AuthService( IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService, IUserRepository userRepository, IEmailService emailService)
         {
             _authRepository = authRepository;
             _mapper = mapper;
@@ -33,6 +38,7 @@ namespace Hairlytics.Application.Services
             _jwtService = jwtService;
             _userRepository = userRepository;
             _emailService = emailService;
+           
         }
 
         public async Task<ServiceResponse<string>> ForgortPasswordAsync(string username)
@@ -64,6 +70,7 @@ namespace Hairlytics.Application.Services
 
                 response.Success = true;
                 response.Message = $"Your OTP is sent on your register email id";
+                response.Data = otp;
             }
             else
             {
@@ -402,5 +409,59 @@ namespace Hairlytics.Application.Services
             return response;
         }
     
+    
+
+
+        //  Admin work //
+
+
+        public async Task<UserLoginDto?> LoginAdminAsync(LoginDto dto)
+        {
+            var user = await _authRepository.GetByUsernameAsync(dto.Username);
+
+
+            if (user == null)
+            {
+              return null;
+            } 
+            else
+            {
+
+                // verify password
+                bool isPasswordCorrect = _passwordHasher.VerifyPassword(dto.Password, user.Password);
+                if (!isPasswordCorrect)
+                {
+                    return null;
+                }
+                else
+                {
+
+                    return new UserLoginDto
+                    {
+                        Id = user.Id,
+                        Username = user.Username,
+                        Role = user.Role
+                    };
+
+
+                }
+
+            }
+
+        }
+
+        //public async Task LogoutAsync()
+        //{
+        //    //await _httpContextAccessor.HttpContext.SignOutAsync(
+        //    //CookieAuthenticationDefaults.AuthenticationScheme);
+        //    await
+        //}
+
+       
+
+
+
+
+
     }
 }

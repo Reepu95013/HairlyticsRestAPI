@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazor.Bootstrap" Version="3.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hairlytics.Application\Hairlytics.Application.csproj" />
     <ProjectReference Include="..\Hairlytics.Domain\Hairlytics.Domain.csproj" />
     <ProjectReference Include="..\Hairlytics.Infrastructure\Hairlytics.Infrastructure.csproj" />

@@ -102,6 +102,18 @@
         color: #566f84;
     }
 
+.form-control:focus {
+    box-shadow: none;
+    outline: none;
+    background:none;
+}
+
+.form-control{
+    margin-left:10px;
+    margin-right:10Px;
+
+}
+
 .input-group-custom {
     background: #f8fafd;
     border-radius: 60px;

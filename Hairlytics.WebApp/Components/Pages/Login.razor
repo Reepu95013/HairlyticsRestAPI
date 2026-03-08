@@ -1,84 +1,186 @@
 ﻿@page "/Admin/Login"
+@using Hairlytics.Application.DTOs.UserDTOs
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Json
+@inject IAuthService _authService
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@rendermode InteractiveServer
 
 <PageTitle>Login</PageTitle>
 
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 <div class="login-container">
-        <div class="login-card">
-            <!-- LEFT SIDE – dark panel with salon branding (matches dashboard sidebar exactly) -->
-            <div class="login-side">
-                <div>
-                    <div class="brand">
-                        <i class="fas fa-cut"></i> 
-                        <span>Salon<span style="color:#d4a373;">X</span></span>
-                    </div>
-                    <div class="quote">
-                        “Effortless employee & feature control”
-                        <small>seamless access, just like your dashboard</small>
-                    </div>
+    <div class="login-card">
+        <!-- LEFT SIDE – dark panel with salon branding (matches dashboard sidebar exactly) -->
+        <div class="login-side">
+            <div>
+                <div class="brand">
+                    <i class="fas fa-cut"></i>
+                    <span>Hair<span style="color:#d4a373;">lytics</span></span>
                 </div>
-                <ul class="feature-list">
-                    <li><i class="fas fa-user-tie"></i> Manage employees & roles</li>
-                    <li><i class="fas fa-star"></i> Toggle salon features</li>
-                    <li><i class="fas fa-shield-alt"></i> Granular access levels</li>
-                    <li><i class="fas fa-calendar-check"></i> Appointment overview</li>
-                </ul>
-                <div class="mt-4">
-                    <span class="badge-salon"><i class="fas fa-spa me-2"></i>Glow salon admin</span>
+                <div class="quote">
+                    “Effortless employee & feature control”
+                    <small>seamless access, just like your dashboard</small>
                 </div>
             </div>
+            <ul class="feature-list">
+                <li><i class="fas fa-user-tie"></i> Manage employees & roles</li>
+                <li><i class="fas fa-star"></i> Toggle salon features</li>
+                <li><i class="fas fa-shield-alt"></i> Granular access levels</li>
+                <li><i class="fas fa-calendar-check"></i> Appointment overview</li>
+            </ul>
+            <div class="mt-4">
+                <span class="badge-salon"><i class="fas fa-spa me-2"></i>Hairlytices admin</span>
+            </div>
+        </div>
 
-            <!-- RIGHT SIDE – login form (matches dashboard cards / section-card style) -->
-            <div class="login-form-panel">
-                <div class="login-header">
-                    <h2>Welcome back</h2>
-                    <p>Sign in to manage your salon dashboard</p>
+        <!-- RIGHT SIDE – login form (matches dashboard cards / section-card style) -->
+        <div class="login-form-panel">
+            <div class="login-header">
+                <h2>Welcome back</h2>
+                <p>Sign in to manage your salon dashboard</p>
+            </div>
+
+            <!-- login form (no actual submit, just demo) -->
+            @if (showForgotPassword)
+            {
+                <ForgotPassword OnForgotSwitch="HandleForgotSwitch" />
+
+            }
+            else
+            {
+                <div class="input-group-custom">
+                    <span><i class="fas fa-user"></i></span>
+                    <input type="text" @bind="login.Username" placeholder="Username" required>
                 </div>
 
-                <!-- login form (no actual submit, just demo) -->
-                <form>
-                    <div class="input-group-custom">
-                        <span><i class="far fa-envelope"></i></span>
-                        <input type="email" placeholder="Email address" value="admin@glowsalon.com" required>
-                    </div>
-                    <div class="input-group-custom">
-                        <span><i class="fas fa-lock"></i></span>
-                        <input type="password" placeholder="Password" value="••••••••" required>
-                    </div>
-                    
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="rememberCheck" checked>
-                            <label class="form-check-label" for="rememberCheck" style="color:#334155;">
-                                Keep me signed in
-                            </label>
-                        </div>
-                        <a href="#" class="forgot-link">Forgot password?</a>
-                    </div>
 
-                    <button type="submit" class="btn-login">
-                        <i class="fas fa-arrow-right-to-bracket me-2"></i> Sign in to dashboard
-                    </button>
 
-                    <div class="text-center mt-4 register-badge">
-                        <span>🔐 demo credentials — click sign in</span>
-                    </div>
-                    <hr class="my-4">
-                    <div class="text-center text-secondary small">
-                        <i class="fas fa-shield me-1"></i> secure admin access · v2.0
-                    </div>
-                </form>
-
-                <!-- hint: quick role cards (just for style) -->
-                <div class="d-flex gap-2 mt-4 pt-2">
-                    <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-user-tie"></i></span>
-                    <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-cut"></i></span>
-                    <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-cog"></i></span>
+                <div class="input-group-custom">
+                    <span><i class="fas fa-lock"></i></span>
+                    <input type="password" @bind="login.Password" placeholder="Password" required>
                 </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberCheck" checked>
+                        <label class="form-check-label" for="rememberCheck" style="color:#334155;">
+                            Keep me signed in
+                        </label>
+                    </div>
+
+                    <a @onclick="HandleForgotSwitch" type="button" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-login" @onclick="OnClickLogin">
+                    <i class="fas fa-arrow-right-to-bracket me-2"></i> Sign in to dashboard
+                </button>
+
+                @* </EditForm> *@
+            }
+            <!-- hint: quick role cards (just for style) -->
+            <div class="d-flex gap-2 mt-4 pt-2">
+                <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-user-tie"></i></span>
+                <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-cut"></i></span>
+                <span class="avatar-sm d-flex align-items-center justify-content-center bg-light"><i class="fas fa-cog"></i></span>
             </div>
         </div>
     </div>
+</div>
 
 
 @code {
+   
+    private List<ToastMessage> messages = new();
+
+    public LoginDto login { get; set; } = new()
+    {
+        Username = "",
+        Password = ""
+    };
+
+  
+
+    private string? result { get; set; }
+
+    private bool showForgotPassword { get; set; } = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            navigationManager.NavigateTo("/", true);
+        }
+    }
+
+
+
+
+    private void HandleLogin()
+    {
+        var json = JsonSerializer.Serialize(login);
+        var encoded = Uri.EscapeDataString(json);
+
+        navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
+
+    }
+
+
+    private async Task OnClickLogin()
+    {
+        if (!string.IsNullOrWhiteSpace(login.Username) || !string.IsNullOrWhiteSpace(login.Password))
+        {
+            var data = await _authService.LoginAdminAsync(login);
+            if (data != null)
+            {
+                var json = JsonSerializer.Serialize(data);
+                var encoded = Uri.EscapeDataString(json);
+                navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
+            }
+            else
+            {
+                messages.Add(new ToastMessage
+                {
+                    Type = ToastType.Danger,
+                    Title = "Failed",
+                    Message = "Invalid Username or Password!"
+                });
+                
+            }
+
+
+        }
+        else
+        {
+            messages.Add(new ToastMessage
+            {
+                Type = ToastType.Danger,
+                Title = "Failed",
+                Message = "Username and Password is required!"
+            });
+        }
+   
+    }
+
+
+
+    private void HandleForgotSwitch()
+    {
+        showForgotPassword = !showForgotPassword;
+
+    }
+
+
+
+
+
 
 }

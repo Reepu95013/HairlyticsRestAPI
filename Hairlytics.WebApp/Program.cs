@@ -20,12 +20,19 @@ option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureRepository();
+builder.Services.AddHttpContextAccessor();
 
 // add helper class and interface
 builder.Services.AddSingleton<IPasswordHasher>(sp => new BcryptPasswordHasher(workFactor: 12));
 
 // ? AutoMapper (Clean Architecture)
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// add Blazor.Bootstrap
+
+builder.Services.AddBlazorBootstrap();
+
+
 
 
 // Add Authentication
@@ -35,6 +42,7 @@ builder.Services
     {
         options.Cookie.Name = "AuthCookie";
         options.Cookie.MaxAge = TimeSpan.FromMinutes(20);
+        options.Cookie.HttpOnly = true;
         options.LoginPath = "/Admin/Login";
         options.AccessDeniedPath = "/Error";
     });

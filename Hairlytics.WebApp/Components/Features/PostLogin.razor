@@ -1,0 +1,81 @@
+﻿@page "/PostLogin"
+@inject NavigationManager navigationManager;
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IAuthService _authService
+
+@using Hairlytics.Application.DTOs.UserDTOs
+
+@inject AuthenticationStateProvider AuthStateProvider
+
+
+
+@code {
+
+    [CascadingParameter]
+    private HttpContext? httpContext { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? quary { get; set; }
+
+    public UserLoginDto useData { get; set; } = new();
+
+
+    
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (string.IsNullOrEmpty(quary))
+        {
+            navigationManager.NavigateTo("/Admin/Login");
+        }
+        else
+        {
+            var decoded = Uri.UnescapeDataString(quary);
+
+            var result = JsonSerializer.Deserialize<UserLoginDto>(decoded);
+
+            if (result != null)
+            {
+                useData = result;
+            }
+            else
+            {
+                navigationManager.NavigateTo("/Admin/Login");
+            }           
+
+            if (useData != null)
+            {
+                var claim = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, useData.Id.ToString()),
+                    new Claim(ClaimTypes.Name, useData.Username),
+                    new Claim(ClaimTypes.Role, useData.Role.ToString())
+                };
+
+
+                var identity = new ClaimsIdentity(claim, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var principal = new ClaimsPrincipal(identity);
+
+
+                await httpContext!.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                navigationManager.NavigateTo("/");
+
+            }
+            else
+            {
+                navigationManager.NavigateTo("/Admin/Login");
+            }
+
+
+        }
+
+
+    }
+
+
+}
