@@ -1,293 +1,240 @@
 ﻿@attribute [Authorize]
 @page "/"
 
-@inject IHttpContextAccessor HttpContextAccessor
-@inject AuthenticationStateProvider AuthStateProvider
-
-
-
-
-
-
-<div class="wrapper">
-    <NavMenu/>
-    <div class="main-content">
-        <!-- header with admin greeting -->
-        <div class="page-header">
-            <div class="header-title d-flex align-items-center">
-                <h2>Admin panel</h2>
-                <span class="badge-salon"><i class="fas fa-spa me-1"></i> Glow salon</span>
-            </div>
-            <div class="d-flex gap-3 align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-light rounded-pill px-4 py-2 shadow-sm" style="border:1px solid #e2e8f0;">
-                        <i class="fas fa-user-circle me-2"></i> @Username <i class="fas fa-chevron-down ms-2 small"></i>
-                    </button>
-                </div>
+<!-- quick stats cards (handle, overview) -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon me-3"><i class="fas fa-cut"></i></div>
+            <div>
+                <span class="text-secondary-emphasis small text-uppercase">Today's bookings</span>
+                <h3 class="fw-bold mb-0">24</h3>
             </div>
         </div>
-
-
-        <!-- quick stats cards (handle, overview) -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="stat-card d-flex align-items-center">
-                    <div class="stat-icon me-3"><i class="fas fa-cut"></i></div>
-                    <div>
-                        <span class="text-secondary-emphasis small text-uppercase">Today's bookings</span>
-                        <h3 class="fw-bold mb-0">24</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card d-flex align-items-center">
-                    <div class="stat-icon me-3"><i class="fas fa-user-friends"></i></div>
-                    <div>
-                        <span class="text-secondary-emphasis small">ACTIVE EMPLOYEES</span>
-                        <h3 class="fw-bold mb-0">12</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card d-flex align-items-center">
-                    <div class="stat-icon me-3"><i class="fas fa-spa"></i></div>
-                    <div>
-                        <span class="text-secondary-emphasis small">FEATURES</span>
-                        <h3 class="fw-bold mb-0">18</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card d-flex align-items-center">
-                    <div class="stat-icon me-3"><i class="fas fa-lock-open"></i></div>
-                    <div>
-                        <span class="text-secondary-emphasis small">ACCESS ROLES</span>
-                        <h3 class="fw-bold mb-0">5</h3>
-                    </div>
-                </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon me-3"><i class="fas fa-user-friends"></i></div>
+            <div>
+                <span class="text-secondary-emphasis small">ACTIVE EMPLOYEES</span>
+                <h3 class="fw-bold mb-0">12</h3>
             </div>
         </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon me-3"><i class="fas fa-spa"></i></div>
+            <div>
+                <span class="text-secondary-emphasis small">FEATURES</span>
+                <h3 class="fw-bold mb-0">18</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon me-3"><i class="fas fa-lock-open"></i></div>
+            <div>
+                <span class="text-secondary-emphasis small">ACCESS ROLES</span>
+                <h3 class="fw-bold mb-0">5</h3>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <!-- ========= EMPLOYEE SECTION ========= -->
-        <div class="section-card" id="employeeSection">
+<!-- ========= EMPLOYEE SECTION ========= -->
+<div class="section-card" id="employeeSection">
+    <div class="d-flex align-items-center justify-content-between">
+        <h4 class="section-title mb-0"><i class="fas fa-user-tie me-2" style="color:#d4a373;"></i> Employee management</h4>
+        <button class="btn btn-outline-admin"><i class="fas fa-plus me-1"></i> Add employee</button>
+    </div>
+    <div class="table-responsive mt-3">
+        <table class="table table-admin align-middle">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Role / Position</th>
+                    <th>Services</th>
+                    <th>Status</th>
+                    <th>Access level</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">JD</span>
+                            <div>Jenna Davis <br><small class="text-secondary">jenna.d@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Senior stylist</td>
+                    <td><span class="feature-tag">haircut</span> <span class="feature-tag">color</span></td>
+                    <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
+                    <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">manager</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">MC</span>
+                            <div>Marcus Chen<br><small class="text-secondary">m.chen@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Nail artist</td>
+                    <td><span class="feature-tag">manicure</span> <span class="feature-tag">gel</span> <span class="feature-tag">nail art</span></td>
+                    <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
+                    <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill">staff</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">LR</span>
+                            <div>Lina Rojas<br><small class="text-secondary">lina.r@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Esthetician</td>
+                    <td><span class="feature-tag">facial</span> <span class="feature-tag">waxing</span> <span class="feature-tag">peel</span></td>
+                    <td><span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill">break</span></td>
+                    <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill">staff</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">TK</span>
+                            <div>Tara Kapoor<br><small class="text-secondary">tara.k@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Reception / admin</td>
+                    <td><span class="feature-tag">booking</span> <span class="feature-tag">client</span></td>
+                    <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
+                    <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">admin</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-end mt-2">
+        <a href="#" class="text-decoration-none small">view all employees <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+</div>
+
+<!-- ========= FEATURES & ACCESS combined row (2 cols) ========= -->
+<div class="row g-4">
+    <!-- FEATURE section (left) -->
+    <div class="col-lg-6">
+        <div class="section-card h-100">
             <div class="d-flex align-items-center justify-content-between">
-                <h4 class="section-title mb-0"><i class="fas fa-user-tie me-2" style="color:#d4a373;"></i> Employee management</h4>
-                <button class="btn btn-outline-admin"><i class="fas fa-plus me-1"></i> Add employee</button>
+                <h4 class="section-title mb-0"><i class="fas fa-star me-2" style="color:#d4a373;"></i> Salon features</h4>
+                <button class="btn btn-outline-admin"><i class="fas fa-plus"></i> feature</button>
             </div>
-            <div class="table-responsive mt-3">
-                <table class="table table-admin align-middle">
+            <div class="mt-3">
+                <table class="table table-admin">
                     <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Role / Position</th>
-                            <th>Services</th>
-                            <th>Status</th>
-                            <th>Access level</th>
-                            <th>Actions</th>
-                        </tr>
+                        <tr><th>Feature name</th><th>Category</th><th>Pricing</th><th>Active</th><th></th></tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="avatar-sm">JD</span>
-                                    <div>Jenna Davis <br><small class="text-secondary">jenna.d@salonx</small></div>
-                                </div>
-                            </td>
-                            <td>Senior stylist</td>
-                            <td><span class="feature-tag">haircut</span> <span class="feature-tag">color</span></td>
-                            <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
-                            <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">manager</span></td>
-                            <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="avatar-sm">MC</span>
-                                    <div>Marcus Chen<br><small class="text-secondary">m.chen@salonx</small></div>
-                                </div>
-                            </td>
-                            <td>Nail artist</td>
-                            <td><span class="feature-tag">manicure</span> <span class="feature-tag">gel</span> <span class="feature-tag">nail art</span></td>
-                            <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
-                            <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill">staff</span></td>
-                            <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="avatar-sm">LR</span>
-                                    <div>Lina Rojas<br><small class="text-secondary">lina.r@salonx</small></div>
-                                </div>
-                            </td>
-                            <td>Esthetician</td>
-                            <td><span class="feature-tag">facial</span> <span class="feature-tag">waxing</span> <span class="feature-tag">peel</span></td>
-                            <td><span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill">break</span></td>
-                            <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill">staff</span></td>
-                            <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="avatar-sm">TK</span>
-                                    <div>Tara Kapoor<br><small class="text-secondary">tara.k@salonx</small></div>
-                                </div>
-                            </td>
-                            <td>Reception / admin</td>
-                            <td><span class="feature-tag">booking</span> <span class="feature-tag">client</span></td>
-                            <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
-                            <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">admin</span></td>
-                            <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
-                        </tr>
+                        <tr><td>Precision haircut</td><td>hair</td><td>$45</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
+                        <tr><td>Balayage</td><td>color</td><td>$120</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
+                        <tr><td>Gel manicure</td><td>nails</td><td>$35</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
+                        <tr><td>Signature facial</td><td>skincare</td><td>$80</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
+                        <tr><td>Brazilian wax</td><td>waxing</td><td>$55</td><td><i class="fas fa-times-circle text-secondary"></i></td><td><i class="fas fa-toggle-off text-secondary fs-5"></i></td></tr>
+                        <tr><td>Lash lift</td><td>eyes</td><td>$65</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
                     </tbody>
                 </table>
             </div>
-            <div class="text-end mt-2">
-                <a href="#" class="text-decoration-none small">view all employees <i class="fas fa-arrow-right ms-1"></i></a>
+            <div class="mt-2">
+                <span class="feature-tag"><i class="far fa-clock me-1"></i> 18 active features</span>
             </div>
         </div>
-
-        <!-- ========= FEATURES & ACCESS combined row (2 cols) ========= -->
-        <div class="row g-4">
-            <!-- FEATURE section (left) -->
-            <div class="col-lg-6">
-                <div class="section-card h-100">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4 class="section-title mb-0"><i class="fas fa-star me-2" style="color:#d4a373;"></i> Salon features</h4>
-                        <button class="btn btn-outline-admin"><i class="fas fa-plus"></i> feature</button>
-                    </div>
-                    <div class="mt-3">
-                        <table class="table table-admin">
-                            <thead>
-                                <tr><th>Feature name</th><th>Category</th><th>Pricing</th><th>Active</th><th></th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Precision haircut</td><td>hair</td><td>$45</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
-                                <tr><td>Balayage</td><td>color</td><td>$120</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
-                                <tr><td>Gel manicure</td><td>nails</td><td>$35</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
-                                <tr><td>Signature facial</td><td>skincare</td><td>$80</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
-                                <tr><td>Brazilian wax</td><td>waxing</td><td>$55</td><td><i class="fas fa-times-circle text-secondary"></i></td><td><i class="fas fa-toggle-off text-secondary fs-5"></i></td></tr>
-                                <tr><td>Lash lift</td><td>eyes</td><td>$65</td><td><i class="fas fa-check-circle text-success"></i></td><td><i class="fas fa-toggle-on text-success fs-5"></i></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-2">
-                        <span class="feature-tag"><i class="far fa-clock me-1"></i> 18 active features</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACCESS section (right)  -->
-            <div class="col-lg-6">
-                <div class="section-card h-100">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h4 class="section-title mb-0"><i class="fas fa-shield-alt me-2" style="color:#d4a373;"></i> Access & permissions</h4>
-                        <button class="btn btn-outline-admin"><i class="fas fa-user-lock"></i> manage roles</button>
-                    </div>
-                    <div class="mt-3">
-                        <table class="table table-admin">
-                            <thead>
-                                <tr><th>Role</th><th>employees</th><th>dashboard</th><th>employees</th><th>features</th><th>access</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Admin</strong></td>
-                                    <td>2</td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Manager</strong></td>
-                                    <td>3</td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Staff</strong></td>
-                                    <td>7</td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                    <td><i class="fas fa-check text-success"></i> (view)</td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Reception</strong></td>
-                                    <td>2</td>
-                                    <td><i class="fas fa-check text-success"></i></td>
-                                    <td><i class="fas fa-eye text-secondary"></i></td>
-                                    <td><i class="fas fa-eye text-secondary"></i></td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Trainee</strong></td>
-                                    <td>2</td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                    <td><i class="fas fa-check text-success"></i> (read)</td>
-                                    <td><i class="fas fa-times text-danger"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- inline access switch example -->
-                        <div class="mt-3 p-3 bg-light rounded-4 d-flex align-items-center justify-content-between">
-                            <span><i class="fas fa-door-open me-2"></i> <strong>Quick access: </strong> new appointment feature for staff</span>
-                            <div class="form-check form-switch access-switch">
-                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
-                                <label class="form-check-label" for="flexSwitchCheckChecked">enabled</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- extra row: "handle" section / recent activity (just to tie handle concept) -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="section-card d-flex align-items-center justify-content-between p-3">
-                    <div><i class="fas fa-hand-paper me-2 fs-4" style="color:#d4a373;"></i> <strong>Handle incoming requests:</strong> 2 new appointment requests pending</div>
-                    <button class="btn btn-dark px-5 py-2 rounded-pill" style="background:#1e2a3a;">Review bookings</button>
-                </div>
-            </div>
-        </div>
-    
     </div>
 
+    <!-- ACCESS section (right)  -->
+    <div class="col-lg-6">
+        <div class="section-card h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <h4 class="section-title mb-0"><i class="fas fa-shield-alt me-2" style="color:#d4a373;"></i> Access & permissions</h4>
+                <button class="btn btn-outline-admin"><i class="fas fa-user-lock"></i> manage roles</button>
+            </div>
+            <div class="mt-3">
+                <table class="table table-admin">
+                    <thead>
+                        <tr><th>Role</th><th>employees</th><th>dashboard</th><th>employees</th><th>features</th><th>access</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Admin</strong></td>
+                            <td>2</td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Manager</strong></td>
+                            <td>3</td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Staff</strong></td>
+                            <td>7</td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i> (view)</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reception</strong></td>
+                            <td>2</td>
+                            <td><i class="fas fa-check text-success"></i></td>
+                            <td><i class="fas fa-eye text-secondary"></i></td>
+                            <td><i class="fas fa-eye text-secondary"></i></td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trainee</strong></td>
+                            <td>2</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                            <td><i class="fas fa-check text-success"></i> (read)</td>
+                            <td><i class="fas fa-times text-danger"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- inline access switch example -->
+                <div class="mt-3 p-3 bg-light rounded-4 d-flex align-items-center justify-content-between">
+                    <span><i class="fas fa-door-open me-2"></i> <strong>Quick access: </strong> new appointment feature for staff</span>
+                    <div class="form-check form-switch access-switch">
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">enabled</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- extra row: "handle" section / recent activity (just to tie handle concept) -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="section-card d-flex align-items-center justify-content-between p-3">
+            <div><i class="fas fa-hand-paper me-2 fs-4" style="color:#d4a373;"></i> <strong>Handle incoming requests:</strong> 2 new appointment requests pending</div>
+            <button class="btn btn-dark px-5 py-2 rounded-pill" style="background:#1e2a3a;">Review bookings</button>
+        </div>
+    </div>
 </div>
 
 
 
-@code{
-    private string? Username { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
 
-        if (user!= null)
-        {
-            if (user.Identity.IsAuthenticated)
-            {
-                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var username = user.FindFirst(ClaimTypes.Name)?.Value;
-                var role = user.FindFirst(ClaimTypes.Role)?.Value;
 
-                Username = username;
 
-                Console.WriteLine($"UserId: {userId}");
-                Console.WriteLine($"Username: {username}");
-                Console.WriteLine($"Role: {role}");
-            }
-        }
-        
+@code {
 
-        // Console.WriteLine(cookieValue);
-    }
 }

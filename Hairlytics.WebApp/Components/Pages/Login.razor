@@ -119,19 +119,7 @@
         {
             navigationManager.NavigateTo("/", true);
         }
-    }
-
-
-
-
-    private void HandleLogin()
-    {
-        var json = JsonSerializer.Serialize(login);
-        var encoded = Uri.EscapeDataString(json);
-
-        navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
-
-    }
+    }   
 
 
     private async Task OnClickLogin()

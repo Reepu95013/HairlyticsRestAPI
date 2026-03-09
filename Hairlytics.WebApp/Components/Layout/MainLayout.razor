@@ -1,6 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+
+<AuthorizeView>
+    <Authorized>
+        <div class="wrapper">
+            <NavMenu />
+            <div class="main-content">
+                <HeaderComponent />
+                @Body
+            </div>
+        </div>
+      
+    </Authorized>
+
+    <NotAuthorized>
+        @Body
+    </NotAuthorized>
+</AuthorizeView>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

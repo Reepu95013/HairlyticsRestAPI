@@ -1,0 +1,16 @@
+﻿@page "/PostLogout"
+@inject NavigationManager navigationManager
+
+@code {
+
+    [CascadingParameter]
+    private HttpContext? httpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await httpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        navigationManager.NavigateTo("/Admin/Login", forceLoad:true);
+
+    }
+
+}
