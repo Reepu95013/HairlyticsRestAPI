@@ -1,0 +1,93 @@
+﻿@page "/Employee"
+
+
+<!-- ========= EMPLOYEE SECTION ========= -->
+<div class="section-card" id="employeeSection">
+    <div class="d-flex align-items-center justify-content-between">
+        <h4 class="section-title mb-0"><i class="fas fa-user-tie me-2" style="color:#d4a373;"></i> Employee management</h4>
+        <button class="btn btn-outline-admin"><i class="fas fa-plus me-1"></i> Add employee</button>
+    </div>
+    <div class="table-responsive mt-3">
+        <table class="table table-admin align-middle">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Role / Position</th>
+                    <th>Services</th>
+                    <th>Status</th>
+                    <th>Access level</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">JD</span>
+                            <div>Jenna Davis <br><small class="text-secondary">jenna.d@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Senior stylist</td>
+                    <td><span class="feature-tag">haircut</span> <span class="feature-tag">color</span></td>
+                    <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
+                    <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">manager</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">MC</span>
+                            <div>Marcus Chen<br><small class="text-secondary">m.chen@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Nail artist</td>
+                    <td><span class="feature-tag">manicure</span> <span class="feature-tag">gel</span> <span class="feature-tag">nail art</span></td>
+                    <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
+                    <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill">staff</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">LR</span>
+                            <div>Lina Rojas<br><small class="text-secondary">lina.r@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Esthetician</td>
+                    <td><span class="feature-tag">facial</span> <span class="feature-tag">waxing</span> <span class="feature-tag">peel</span></td>
+                    <td><span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill">break</span></td>
+                    <td><span class="badge bg-light text-dark px-3 py-2 rounded-pill">staff</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="avatar-sm">TK</span>
+                            <div>Tara Kapoor<br><small class="text-secondary">tara.k@salonx</small></div>
+                        </div>
+                    </td>
+                    <td>Reception / admin</td>
+                    <td><span class="feature-tag">booking</span> <span class="feature-tag">client</span></td>
+                    <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
+                    <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">admin</span></td>
+                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- small footer -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <span class="small text-secondary"><i class="far fa-clock"></i> updated 2 min ago</span>
+        <span><i class="fas fa-chevron-left me-2"></i> 1-6 of 23 <i class="fas fa-chevron-right ms-2"></i></span>
+    </div>
+
+   
+</div>
+
+
+
+
+@code {
+
+}

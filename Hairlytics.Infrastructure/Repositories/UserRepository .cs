@@ -1,10 +1,12 @@
 ﻿using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,8 +42,16 @@ namespace Hairlytics.Infrastructure.Repositories
             return await _context.Users.Include(u => u.VendorProfile).AsNoTracking().ToListAsync();
         }
 
-      
+        public async Task<bool> CheckAdminExitsAsync(UserRole userRole)
+        {
+            return await _context.Users.AnyAsync(u => u.Role == userRole);
 
+        }
 
+        public async Task<List<User>> GetUserListAsync(UserRole userRole)
+        {
+            return await _context.Users.Where(u => u.Role == userRole).ToListAsync();
+
+        }
     }
 }

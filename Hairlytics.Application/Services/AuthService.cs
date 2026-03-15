@@ -28,9 +28,9 @@ namespace Hairlytics.Application.Services
         private readonly IJwtService _jwtService;
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
-       
 
-        public AuthService( IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService, IUserRepository userRepository, IEmailService emailService)
+
+        public AuthService(IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService, IUserRepository userRepository, IEmailService emailService)
         {
             _authRepository = authRepository;
             _mapper = mapper;
@@ -38,7 +38,7 @@ namespace Hairlytics.Application.Services
             _jwtService = jwtService;
             _userRepository = userRepository;
             _emailService = emailService;
-           
+
         }
 
         public async Task<ServiceResponse<string>> ForgortPasswordAsync(string username)
@@ -55,7 +55,7 @@ namespace Hairlytics.Application.Services
                     Email = user.Email,
                     Phone = user.Phone,
                     OTP = otp,
-                    ExpiryTime= DateTime.Now.AddMinutes(10),
+                    ExpiryTime = DateTime.Now.AddMinutes(10),
                 };
 
                 var mail = new EmailDto
@@ -64,7 +64,7 @@ namespace Hairlytics.Application.Services
                     "Forgot Password",
                     EmailBody.EmailStringBody($"Your OTP is {otp}. It is valid for 10 minutes.")
 
-                );               
+                );
                 _emailService.SendEmail(mail);
                 await _authRepository.ForgotPassword(forgortpasswrd);
 
@@ -85,11 +85,11 @@ namespace Hairlytics.Application.Services
 
         public async Task<ServiceResponse<TokenResponseDto>> LoginUserAsync(string username, string password)
         {
-           // declare retun type 
+            // declare retun type 
             var response = new ServiceResponse<TokenResponseDto>();
 
             // check user exit or not
-            var user  =  await _authRepository.GetByUsernameAsync(username);
+            var user = await _authRepository.GetByUsernameAsync(username);
             if (user == null)
             {
                 response.Message = "Username or Password is incorrect!";
@@ -144,28 +144,29 @@ namespace Hairlytics.Application.Services
 
         }
 
+
         public async Task<ServiceResponse<TokenResponseDto?>> RefreshTokenAsync(int userId, string refreshToken)
         {
             // declare retun type 
             var response = new ServiceResponse<TokenResponseDto?>();
 
-            var  refreshTokenData = await _authRepository.RefreshToken(userId, refreshToken);
-                    if (refreshTokenData!=null)
-                    {
-                        var user = await _userRepository.GetUserAsync(userId);
-                        // generate jwt token
-                        string token = _jwtService.GenerateToken(user);
+            var refreshTokenData = await _authRepository.RefreshToken(userId, refreshToken);
+            if (refreshTokenData != null)
+            {
+                var user = await _userRepository.GetUserAsync(userId);
+                // generate jwt token
+                string token = _jwtService.GenerateToken(user);
 
 
-                        var data = new TokenResponseDto
-                        {
-                            Token = token,
-                            RefreshToken = refreshTokenData.Token
-                        };
+                var data = new TokenResponseDto
+                {
+                    Token = token,
+                    RefreshToken = refreshTokenData.Token
+                };
 
-                        response.Data = data;
-                        response.Success = true;
-                        response.Message = "New Token Created Successfully!";
+                response.Data = data;
+                response.Success = true;
+                response.Message = "New Token Created Successfully!";
 
             }
             else
@@ -173,7 +174,7 @@ namespace Hairlytics.Application.Services
                 response.Success = false;
                 response.Message = "Record not found!";
 
-               
+
             }
 
             return response;
@@ -192,7 +193,24 @@ namespace Hairlytics.Application.Services
             }
 
 
-            bool emailexit = await _userRepository.CheckEmailExitsAsync(dto.Email);
+            if(dto.Role == UserRole.Admin)
+            {
+                bool adminExit = await _userRepository.CheckAdminExitsAsync(dto.Role);
+
+                if (adminExit)
+                {
+                    response.Success = false;
+                    response.Message = "You can't create multiple admin!";
+                    return response;
+                }
+
+            }
+
+          
+
+            var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
+
+            bool emailexit = existingUser?.Email == dto.Email;
 
             if (emailexit)
             {
@@ -201,20 +219,15 @@ namespace Hairlytics.Application.Services
                 return response;
             }
 
-
-            
-
-            // check user exit or not
-            var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
             if (existingUser != null)
             {
                 response.Success = false;
-                response.Message = "Username already exists.";               
+                response.Message = "Username already exists.";
             }
             else
             {
                 // validate role
-                if (dto.Role == UserRole.Admin || dto.Role == UserRole.SubAdmin)
+                if (dto.Role == UserRole.SubAdmin)
                 {
                     response.Success = false;
                     response.Message = "You have not permission!";
@@ -292,24 +305,25 @@ namespace Hairlytics.Application.Services
 
                 }
 
-            }            
+            }
 
-           return response;
+            return response;
         }
 
         public async Task<ServiceResponse<string>> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
         {
             // declare retun type 
             var response = new ServiceResponse<string>();
-            if (resetPasswordDto != null) {
-                if(resetPasswordDto.Password !=resetPasswordDto.ConfirmPassword || resetPasswordDto.Password.Length < 8)
+            if (resetPasswordDto != null)
+            {
+                if (resetPasswordDto.Password != resetPasswordDto.ConfirmPassword || resetPasswordDto.Password.Length < 8)
                 {
                     response.Success = false;
                     response.Message = "Password and confirm password must be same and password length should be 8";
                 }
                 else
                 {
-                   var data = await _authRepository.GetResetPasswordData(resetPasswordDto.Email);
+                    var data = await _authRepository.GetResetPasswordData(resetPasswordDto.Email);
 
                     if (data != null)
                     {
@@ -356,7 +370,7 @@ namespace Hairlytics.Application.Services
                         response.Message = "Not found record!";
                     }
 
-                    
+
 
                 }
 
@@ -369,11 +383,11 @@ namespace Hairlytics.Application.Services
 
 
 
-            return response;   
+            return response;
         }
-    
-    
-        public async Task<ServiceResponse<string>>ChangePasswordAsync(ChangePasswordDto changePasswordDto)
+
+
+        public async Task<ServiceResponse<string>> ChangePasswordAsync(ChangePasswordDto changePasswordDto)
         {
             // declare retun type 
             var response = new ServiceResponse<string>();
@@ -408,8 +422,8 @@ namespace Hairlytics.Application.Services
 
             return response;
         }
-    
-    
+
+
 
 
         //  Admin work //
@@ -422,8 +436,8 @@ namespace Hairlytics.Application.Services
 
             if (user == null)
             {
-              return null;
-            } 
+                return null;
+            }
             else
             {
 
@@ -435,7 +449,6 @@ namespace Hairlytics.Application.Services
                 }
                 else
                 {
-
                     return new UserLoginDto
                     {
                         Id = user.Id,
@@ -443,11 +456,125 @@ namespace Hairlytics.Application.Services
                         Role = user.Role
                     };
 
+                }
+
+            }
+
+        }
+
+
+        public async Task<ServiceResponse<TokenResponseDto>> RegisterAdminAsync(UserCreateDto dto)
+        {
+            // declare retun type 
+            var response = new ServiceResponse<TokenResponseDto>();
+
+            if (!new EmailAddressAttribute().IsValid(dto.Email))
+            {
+                response.Success = false;
+                response.Message = "Invalid email address";
+                return response;
+            }
+
+            var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
+
+            bool emailexit = existingUser?.Email == dto.Email;
+
+            if (emailexit)
+            {
+                response.Success = false;
+                response.Message = "Email already exists , try with another eamil!";
+                return response;
+            }
+
+            if (existingUser != null)
+            {
+                response.Success = false;
+                response.Message = "Username already exists.";
+            }
+            else
+            {
+                // validate role
+                if (dto.Role == UserRole.Admin)
+                {
+                    response.Success = false;
+                    response.Message = "You can't create multitple admin!";
+                }
+                else
+                {
+                    // creating hash password
+                    string hashedPassword = _passwordHasher.HashPassword(dto.Password);
+
+                    dto.Password = hashedPassword;
+                    dto.CreatedAt = DateTime.Now;
+                    dto.UpdatedAt = DateTime.Now;
+
+                    var newUser = _mapper.Map<User>(dto);
+
+                    // create a user as vendor or customer
+                    if (dto.Role == UserRole.Vendor)
+                    {
+                        if (dto.VendorProfileCreateDto == null)
+                        {
+                            response.Success = false;
+                            response.Message = "Vendor profile is required!";
+                        }
+                        else
+                        {
+                            var vendorProfile = _mapper.Map<VendorProfile>(dto.VendorProfileCreateDto);
+                            vendorProfile.CreatedAt = DateTime.Now;
+                            vendorProfile.UpdatedAt = DateTime.Now;
+
+                            if (dto.VendorProfileCreateDto.VendorDocumentCreateDto != null)
+                            {
+                                foreach (var docDto in dto.VendorProfileCreateDto.VendorDocumentCreateDto)
+                                {
+                                    var document = _mapper.Map<VendorDocument>(docDto);
+                                    document.CreatedAt = DateTime.Now;
+                                    document.UpdatedAt = DateTime.Now;
+                                    vendorProfile.Documents.Add(document);
+                                }
+                            }
+
+                            newUser.VendorProfile = vendorProfile;
+
+                        }
+                    }
+
+                    await _authRepository.CreateUserAsync(newUser);
+
+
+                    // refresh token creating
+                    string refreshToken = Helper.GenerateRefreshToken();
+
+                    var refeshTokenData = new RefreshToken
+                    {
+                        UserId = newUser.Id,
+                        Token = refreshToken,
+                        ExpiryDate = DateTime.Now.AddDays(7),
+                        IsRevoked = false
+                    };
+
+                    await _authRepository.CreateRefreshToken(refeshTokenData);
+                    await _authRepository.SaveChangesAsync();
+
+                    // generate jwt token
+                    string token = _jwtService.GenerateToken(newUser);
+
+                    var data = new TokenResponseDto
+                    {
+                        Token = token,
+                        RefreshToken = refreshToken
+                    };
+
+                    response.Data = data;
+                    response.Success = true;
+                    response.Message = "Your Account has been Created Successfully!";
 
                 }
 
             }
 
+            return response;
         }
 
         //public async Task LogoutAsync()
@@ -457,7 +584,7 @@ namespace Hairlytics.Application.Services
         //    await
         //}
 
-       
+
 
 
 

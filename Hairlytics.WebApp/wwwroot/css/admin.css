@@ -190,11 +190,15 @@ body {
     padding: 0.3rem 1.2rem;
     font-size: 0.85rem;
 }
+.btn-outline-admin:hover {
+    background-color: #1e2a3a;
+    color: white;
+    border-color: #1e2a3a;
+}
+        
 
 
-    .btn-outline-admin:hover {
-        background-color: #1e2a3a;
-        color: white;
-        border-color: #1e2a3a;
-    }
+
+
+
     

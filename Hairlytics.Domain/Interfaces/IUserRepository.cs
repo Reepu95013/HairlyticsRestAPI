@@ -1,4 +1,5 @@
 ﻿using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,9 @@ namespace Hairlytics.Domain.Interfaces
         Task<User> GetUserAsync(int UserId);
         Task<bool> CheckEmailExitsAsync(string email);
         Task<User?> GetUserByEmailAsync(string email);
+        Task<bool> CheckAdminExitsAsync(UserRole userRole);
+
+        Task<List<User>> GetUserListAsync(UserRole userRole);
+
     }
 }

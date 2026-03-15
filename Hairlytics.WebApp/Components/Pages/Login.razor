@@ -9,6 +9,7 @@
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider AuthStateProvider
 @rendermode InteractiveServer
+@* @inject UserRole userRole *@
 
 <PageTitle>Login</PageTitle>
 
@@ -94,7 +95,7 @@
 
 
 @code {
-   
+
     private List<ToastMessage> messages = new();
 
     public LoginDto login { get; set; } = new()
@@ -103,7 +104,7 @@
         Password = ""
     };
 
-  
+
 
     private string? result { get; set; }
 
@@ -129,9 +130,23 @@
             var data = await _authService.LoginAdminAsync(login);
             if (data != null)
             {
-                var json = JsonSerializer.Serialize(data);
-                var encoded = Uri.EscapeDataString(json);
-                navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
+                if (data.Role == UserRole.Admin)
+                {
+                    var json = JsonSerializer.Serialize(data);
+                    var encoded = Uri.EscapeDataString(json);
+                    navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
+                }
+                else
+                {
+                    messages.Add(new ToastMessage
+                    {
+                        Type = ToastType.Danger,
+                        Title = "Failed",
+                        Message = "Invalid Username or Password!"
+                    });
+                }
+
+                
             }
             else
             {
