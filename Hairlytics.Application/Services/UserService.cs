@@ -3,6 +3,7 @@ using AutoMapper.Configuration.Annotations;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,15 @@ namespace Hairlytics.Application.Services
            var user = await _userRepository.GetUsersAsync();
 
             var users =  _mapper.Map<IEnumerable<UserResponseDto>>(user);
+            return users;
+        }
+
+
+        public async Task<List<UserResponseDto>> GetUsersAsync(UserRole userRole, int pageNumber, int pageSize)
+        {
+            var user = await _userRepository.GetUserListAsync(userRole, pageNumber, pageSize);
+
+            var users = _mapper.Map<List<UserResponseDto>>(user);
             return users;
         }
     }

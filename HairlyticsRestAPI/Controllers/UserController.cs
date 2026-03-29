@@ -21,7 +21,7 @@ namespace HairlyticsRestAPI.Controllers
             _emailService = emailService;
         }
 
-        [Authorize(Roles = nameof(UserRole.Vendor))]
+        [Authorize(Roles = nameof(UserRole.Vendor) + "," + nameof(UserRole.Admin))]
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers() {
            var users = await _userService.GetUsersAsync();

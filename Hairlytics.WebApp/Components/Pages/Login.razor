@@ -77,8 +77,16 @@
                     <a @onclick="HandleForgotSwitch" type="button" class="forgot-link">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="btn-login" @onclick="OnClickLogin">
-                    <i class="fas fa-arrow-right-to-bracket me-2"></i> Sign in to dashboard
+                <button type="submit" class="btn-login" @onclick="OnClickLogin" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-arrow-right-to-bracket me-2"></i>
+                    }
+                     Sign in to dashboard
                 </button>
 
                 @* </EditForm> *@
@@ -105,7 +113,7 @@
     };
 
 
-
+    private bool isLoading = false;
     private string? result { get; set; }
 
     private bool showForgotPassword { get; set; } = false;
@@ -125,6 +133,7 @@
 
     private async Task OnClickLogin()
     {
+        isLoading = true;
         if (!string.IsNullOrWhiteSpace(login.Username) || !string.IsNullOrWhiteSpace(login.Password))
         {
             var data = await _authService.LoginAdminAsync(login);
@@ -146,7 +155,7 @@
                     });
                 }
 
-                
+
             }
             else
             {
@@ -156,7 +165,7 @@
                     Title = "Failed",
                     Message = "Invalid Username or Password!"
                 });
-                
+
             }
 
 
@@ -170,7 +179,8 @@
                 Message = "Username and Password is required!"
             });
         }
-   
+
+        isLoading = false;
     }
 
 

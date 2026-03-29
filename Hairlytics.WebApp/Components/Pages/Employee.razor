@@ -1,12 +1,15 @@
 ﻿@page "/Employee"
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
 
 
 <!-- ========= EMPLOYEE SECTION ========= -->
 <div class="section-card" id="employeeSection">
     <div class="d-flex align-items-center justify-content-between">
         <h4 class="section-title mb-0"><i class="fas fa-user-tie me-2" style="color:#d4a373;"></i> Employee management</h4>
-        <button class="btn btn-outline-admin"><i class="fas fa-plus me-1"></i> Add employee</button>
-    </div>
+        <button class="btn-outline-admin py-lg-2" @onclick="@GoToAddUser"><i class="fas fa-plus me-1"></i> Add employee</button>
+      </div>
     <div class="table-responsive mt-3">
         <table class="table table-admin align-middle">
             <thead>
@@ -31,7 +34,16 @@
                     <td><span class="feature-tag">haircut</span> <span class="feature-tag">color</span></td>
                     <td><span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span></td>
                     <td><span class="badge bg-info-subtle text-dark px-3 py-2 rounded-pill">manager</span></td>
-                    <td><i class="fas fa-edit text-secondary me-3"></i> <i class="fas fa-trash-alt text-danger-light"></i></td>
+                    <td>
+                        <button @onclick="@UpdateUser" class="btn-icon-none">
+                            <i class="fas fa-edit text-secondary me-3"></i>
+                        </button>
+                        <button @onclick="@UpdateUser">
+                            <i class="fas fa-trash-alt text-danger-light"></i>
+                        </button>
+                        
+                       
+                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -89,5 +101,17 @@
 
 
 @code {
+
+    void GoToAddUser()
+    {
+        navigationManager.NavigateTo("/Add-User", true);
+    }
+
+    void UpdateUser()
+    {
+        navigationManager.NavigateTo("/Edit-User", true);
+       
+    }
+
 
 }

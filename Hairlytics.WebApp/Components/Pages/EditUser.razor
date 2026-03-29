@@ -1,0 +1,109 @@
+﻿@page "/Edit-User"
+
+<div class="page-header">
+    <div class="header-title d-flex align-items-center">
+        <h2><i class="fas fa-user-plus me-3" style="color:#d4a373;"></i>Edit user</h2>
+        <span class="badge-salon ms-3"><i class="fas fa-users me-1"></i> role management</span>
+    </div>
+</div>
+
+
+<div class="section-card">
+    <h4 class="section-title">User information</h4>
+
+    <!-- Blazor Server form simulation: onsubmit prevents page reload, uses JS to mimic navigation -->
+    <form id="editUserForm" onsubmit="event.preventDefault(); handleFormSubmit();">
+        <div class="row">
+            <!-- First Name + Last Name -->
+            <div class="col-md-6 form-row">
+                <label class="form-label"><i class="fas fa-user me-1"></i> First name *</label>
+                <div class="input-group-custom  py-0 px-3">
+                    <input type="text" placeholder="Enter first name" required>
+                </div>
+            </div>
+
+
+            <div class="col-md-6 form-row">
+                <label class="form-label"><i class="fas fa-user me-1"></i> Last name *</label>
+                <div class="input-group-custom py-0 px-3">
+                    <input type="text" placeholder="Enter last name" required>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <!-- Username -->
+
+
+            <div class="col-md-6 form-row">
+                <label class="form-label"><i class="fas fa-envelope me-1"></i> Username *</label>
+                <div class="input-group-custom  py-0 px-3">
+                    <input type="text" placeholder="Username" required>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6 form-row">
+                <label class="form-label"><i class="fas fa-envelope me-1"></i> Email address *</label>
+                <div class="input-group-custom  py-0 px-3">
+                    <input type="email" placeholder="name@example.com" required>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Password -->
+            <div class="col-md-6 form-row">
+                <label class="form-label"><i class="fas fa-lock me-1"></i> Password *</label>
+                <div class="input-group-custom  py-0 px-3">
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <small class="text-secondary">min. 8 characters</small>
+            </div>
+            <!-- Phone Number -->
+            <div class="col-md-6 form-row">
+                <label class="form-label"><i class="fas fa-phone-alt me-1"></i> Phone number *</label>
+                <div class="input-group-custom  py-0 px-3">
+                    <input type="tel" placeholder="+1 234 567 890" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role selection: Sub-admin, User, Vendor (selected by default: User) -->
+
+
+        <div class="row row-cols-6">
+            <div class="col-12">
+                <label class="form-label">
+                    <i class="fas fa-envelope me-1"></i> Role *
+                </label>
+
+                <select class="input-group-custom w-50 py-3 px-3" name="cars" id="cars">
+                    <option value="volvo">Customer</option>
+                    <option value="saab">Sub-Admin</option>
+                    <option value="opel">Vendor</option>
+                </select>
+            </div>
+        </div>
+        <!-- submit + cancel buttons with navigation to "form route" -->
+
+        <div class="d-flex gap-3 mt-4 pt-2">
+            <button class="btn-outline-admin py-lg-2">
+                <i class="fas fa-save me-2"></i> Update
+            </button>
+           </div>
+    </form>
+
+    <!-- additional hint: route simulation (demo) -->
+    <hr class="mt-4">
+    <div class="d-flex align-items-center justify-content-between text-secondary small">
+        <span><i class="fas fa-route me-1"></i> Hairlytics</span>
+        <span><svg class="icon-salon" viewBox="0 0 24 24" width="18"><path d="M5 12 L19 12 M12 5 L19 12 L12 19" /></svg> Hairlytics comming soon</span>
+    </div>
+</div>
+
+@code {
+
+}

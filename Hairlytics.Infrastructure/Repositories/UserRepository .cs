@@ -47,11 +47,15 @@ namespace Hairlytics.Infrastructure.Repositories
             return await _context.Users.AnyAsync(u => u.Role == userRole);
 
         }
+        
 
-        public async Task<List<User>> GetUserListAsync(UserRole userRole)
+        public async Task<List<User>> GetUserListAsync(UserRole userRole, int pageNumber, int pageSize)
         {
-            return await _context.Users.Where(u => u.Role == userRole).ToListAsync();
-
+            return await _context.Users
+                .Where(u => u.Role == userRole)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
     }
 }
