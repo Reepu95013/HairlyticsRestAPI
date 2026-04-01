@@ -10,15 +10,9 @@ namespace Hairlytics.Domain.Interfaces
     public interface ICategoryRepository
     {
        Task AddCategory(Category category);
-       Task <IEnumerable<Category>>GetCategories();
-       Task <IEnumerable<Category>> GetCategoriesByVendor(int vendorId);
-       Task<IEnumerable<Category>> GetCategoriesByVendorAndDefault(int vendorId);
-       Task <bool> DeleteCategory(int categoryId);
-
-
-
-
-
+       Task<List<Category>>GetCategoryList();
+       Task<Category?> GetCategory(int categoryId);
+       Task DeleteCategory(int categoryId);
 
     }
 }

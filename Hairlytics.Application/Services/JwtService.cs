@@ -66,7 +66,7 @@ namespace Hairlytics.Application.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.Now.AddMinutes(1),
+                Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = credentials,
                 Issuer= _config["Jwt:Issuer"],
                 Audience= _config["Jwt:Audience"],
