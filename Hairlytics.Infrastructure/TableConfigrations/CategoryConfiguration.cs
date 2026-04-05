@@ -19,6 +19,13 @@ namespace Hairlytics.Infrastructure.TableConfigrations
                    .WithMany(c => c.SubCategories)
                    .HasForeignKey(c => c.ParentCategoryId)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(s => s.Services)
+                .WithOne(c => c.Category)
+                .HasForeignKey(c => c.CategoryId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
+
 }

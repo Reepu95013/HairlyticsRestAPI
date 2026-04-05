@@ -28,7 +28,8 @@ namespace Hairlytics.Domain.Entities
         public ICollection<VendorDocument> Documents { get; set; } = new List<VendorDocument>();      
         public User? User { get; set; }
         public ICollection<Service> Services { get; set; } = new List<Service>();
-     
+        public ICollection<VendorGallery> Gallery { get; set; } = new List<VendorGallery>();
+
 
     }
 }

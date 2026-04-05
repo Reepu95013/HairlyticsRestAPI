@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,8 +14,9 @@ namespace Hairlytics.Application.DTOs.CategoryDTOs
         [MaxLength(100)]
         public string? CategoryName { get; set; }
 
-        [Required]
         public string? Image { get; set; }
+       
+        public required IFormFile file { get; set; }
 
         [Required]
         [MaxLength(500)]

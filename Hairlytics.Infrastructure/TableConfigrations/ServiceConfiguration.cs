@@ -14,10 +14,7 @@ namespace Hairlytics.Infrastructure.TableConfigrations
         public void Configure(EntityTypeBuilder<Service> builder)
         {
             builder.HasKey(s => s.Id);
-
-            builder.HasMany(s => s.ServiceImages)
-                   .WithOne(si => si.Service)
-                   .HasForeignKey(si => si.ServiceId);
+            
         }
     }
 }

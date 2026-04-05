@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Hairlytics.Application.DTOs.CategoryDTOs;
+using Hairlytics.Application.DTOs.ServiceDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.DTOs.VendorDocumentDTOs;
 using Hairlytics.Application.DTOs.VendorProfileDTOs;
+using Hairlytics.Application.DTOs.VendroGalleryDTOs;
 using Hairlytics.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -57,6 +59,16 @@ namespace Hairlytics.Application.Mapping
 
             CreateMap<CategoryCreateDto, Category>();
             CreateMap<Category, CategoryResponseDto>();
+
+            // create service DTO to entity  and entity to dto
+
+            CreateMap<ServiceCreateDto, Service>();
+            CreateMap<Service, ServiceResponseDto>();
+
+            // create vendor gallery DTO to entity  and entity to dto
+
+            CreateMap<VendorGalleryCreateDto, VendorGallery>();
+            CreateMap<VendorGallery, VendorGalleryResponseDto>();
 
 
 

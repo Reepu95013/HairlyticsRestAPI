@@ -28,6 +28,8 @@ namespace Hairlytics.Infrastructure.Database
         public DbSet<Category> Category { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ForgotPassword> ForgotPassword { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<VendorGallery> VendorGallery { get; set; }
 
 
         

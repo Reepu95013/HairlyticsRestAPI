@@ -17,11 +17,14 @@ namespace Hairlytics.Application.Services
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
+        private readonly IFileService _fileService;
 
-        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
+
+        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper, IFileService fileService)
         {
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _fileService = fileService;
         }
 
         public async Task<ServiceResponse<string>> AddCategoryAsync(CategoryCreateDto categoryCreateDto)
@@ -70,6 +73,13 @@ namespace Hairlytics.Application.Services
 
            var category = _mapper.Map<CategoryResponseDto>(data);
 
+            category.Image = _fileService.GetCategoryImage(category.Image);
+
+            foreach (var item in category.SubCategories)
+            {
+                item.Image = _fileService.GetCategoryImage(item.Image);
+            }
+
             if (category == null)
             {
                 response.Success = false;
@@ -95,6 +105,11 @@ namespace Hairlytics.Application.Services
             var data = await _categoryRepository.GetCategoryList();
 
             var categories = _mapper.Map<List<CategoryResponseDto>>(data);
+
+            foreach (var item in categories)
+            {
+                item.Image = _fileService.GetCategoryImage(item.Image);
+            }
 
             response.Success = true;
             response.Message = "Success";

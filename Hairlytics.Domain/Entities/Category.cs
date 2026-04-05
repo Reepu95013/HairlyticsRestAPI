@@ -23,5 +23,6 @@ namespace Hairlytics.Domain.Entities
 
         public Category? ParentCategory { get; set; }
         public ICollection<Category> SubCategories { get; set; } = new List<Category>();
+        public ICollection<Service> Services { get; set; } = new List<Service>();
     }
 }

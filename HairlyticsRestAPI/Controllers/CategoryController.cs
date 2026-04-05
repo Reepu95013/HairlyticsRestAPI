@@ -1,6 +1,7 @@
 ﻿
 using Hairlytics.Application.DTOs.CategoryDTOs;
 using Hairlytics.Application.ServiceInterfaces;
+using Hairlytics.Application.Services;
 using Hairlytics.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,24 +16,39 @@ namespace HairlyticsRestAPI.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryServices _categoryServices;
-        public CategoryController(ICategoryServices categoryServices)
+        private readonly IFileService _fileService;
+        public CategoryController(ICategoryServices categoryServices, IFileService fileService)
         {
             _categoryServices = categoryServices;
+            _fileService = fileService;
         }
 
         // ✅ 1. Create Category / Subcategory
-        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
+        //[Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
         [HttpPost("create")]
         public async Task<IActionResult> Create(CategoryCreateDto categoryCreateDto)
         {
-            var response = await _categoryServices.AddCategoryAsync(categoryCreateDto);
-            if (response.Success)
+            try
             {
-                return Ok(response);
+                var imagePath = await _fileService.SaveImage(categoryCreateDto.file, FolderNames.Category);
+                categoryCreateDto.Image = imagePath;
+                var response = await _categoryServices.AddCategoryAsync(categoryCreateDto);
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }                
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(response);
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
             }
             
         }
@@ -61,6 +77,7 @@ namespace HairlyticsRestAPI.Controllers
         public async Task<IActionResult> GetCategory(int id)
         {
             var response = await _categoryServices.GetCategoryAsync(id);
+
             if (response.Success)
             {
                 return Ok(response);
@@ -89,5 +106,32 @@ namespace HairlyticsRestAPI.Controllers
             }
 
         }
+
+
+
+       [HttpPost("image")]
+       public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            try
+            {
+                var imagePath = await _fileService.SaveImage(file, "Category");
+
+                return Ok(new
+                {
+                    success = true,
+                    path = imagePath,
+                    message = "Image uploaded successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+       }
     }
+
 }
