@@ -51,5 +51,33 @@ namespace Hairlytics.Application.Services
 
             return response;
         }
+
+        public async Task<ServiceResponse<List<VendorGalleryResponseDto>>> GetVendorGalleryByVendorIdAsync(int vendorId)
+        {
+            var response = new ServiceResponse<List<VendorGalleryResponseDto>>();
+
+            try
+            {
+                var data = await _vendorGalleryRepository.GetByVendorIdAsync(vendorId);
+
+                var mappedData = _mapper.Map<List<VendorGalleryResponseDto>>(data);
+
+                foreach (var item in mappedData)
+                {
+                    item.ImageUrl = _fileService.GetCategoryImage(item.ImageUrl);
+                }
+
+
+                response.Data = mappedData;
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
     }
 }

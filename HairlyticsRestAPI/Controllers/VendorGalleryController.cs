@@ -1,5 +1,7 @@
 ﻿using Hairlytics.Application.DTOs.VendroGalleryDTOs;
 using Hairlytics.Application.ServiceInterfaces;
+using Hairlytics.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HairlyticsRestAPI.Controllers
@@ -13,7 +15,7 @@ namespace HairlyticsRestAPI.Controllers
             _vendorGalleryService = vendorGalleryService;        
         }
 
-        //[Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
+       // [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin) + "," + nameof(UserRole.Vendor))]
         [HttpPost("create")]
         public async Task<IActionResult> Create(VendorGalleryCreateDto vendorGalleryCreateDto)
         {
@@ -27,6 +29,19 @@ namespace HairlyticsRestAPI.Controllers
                 return BadRequest(response);
             }
 
+        }
+
+        //[Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin) + "," + nameof(UserRole.Vendor))]
+        [HttpGet("vendor/{vendorId}")]
+        public async Task<IActionResult> GetVendorGallery(int vendorId)
+        {
+            var response = await _vendorGalleryService.GetVendorGalleryByVendorIdAsync(vendorId);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
 
 

@@ -11,5 +11,6 @@ namespace Hairlytics.Application.ServiceInterfaces
     public interface IVendorGalleryService
     {
         Task<ServiceResponse<string>> AddVendorGalleryAsync (VendorGalleryCreateDto vendroGalleryCreateDto);
+        Task<ServiceResponse<List<VendorGalleryResponseDto>>> GetVendorGalleryByVendorIdAsync(int vendorId);
     }
 }

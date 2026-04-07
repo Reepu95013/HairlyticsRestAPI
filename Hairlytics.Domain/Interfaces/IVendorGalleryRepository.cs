@@ -10,5 +10,6 @@ namespace Hairlytics.Domain.Interfaces
     public interface IVendorGalleryRepository
     {
         Task AddVendorGallery(VendorGallery vendorGallery);
+        Task<List<VendorGallery>> GetByVendorIdAsync(int vendorId);
     }
 }
