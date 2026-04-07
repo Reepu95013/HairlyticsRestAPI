@@ -1,11 +1,7 @@
 ﻿using Hairlytics.Application.ApplicationHelper;
 using Hairlytics.Application.Mapping;
-using Hairlytics.Application.ServiceInterfaces;
-using Hairlytics.Application.Services;
-using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
 using Hairlytics.Infrastructure.Extensions;
-using Hairlytics.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -94,7 +90,7 @@ if (string.IsNullOrEmpty(basePath))
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(basePath),
-    RequestPath = "/FileStorage"
+    RequestPath= "/HairlyticsStorage"
 });
 
 app.UseAuthentication();

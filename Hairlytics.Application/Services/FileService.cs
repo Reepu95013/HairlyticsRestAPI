@@ -25,8 +25,8 @@ namespace Hairlytics.Application.Services
 
         public string GetCategoryImage(string fileName)
         {
-            var baseUrl = _config["AppSettings:BaseUrl"];
-            return $"{baseUrl}/FileStorage{fileName}";
+            var baseUrl = _config["FileStorage:BasePath"];
+            return $"{baseUrl}{fileName}";
         }       
 
         public async Task<string> SaveImage(IFormFile file, string folderName)

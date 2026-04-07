@@ -55,7 +55,7 @@ namespace HairlyticsRestAPI.Controllers
 
 
 
-        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
+        //[Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
         [HttpGet("list")]
         public async Task<IActionResult> GetCategories()
         {
