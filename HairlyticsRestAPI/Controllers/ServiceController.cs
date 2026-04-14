@@ -33,5 +33,19 @@ namespace HairlyticsRestAPI.Controllers
             }
 
         }
+
+
+        [HttpGet("list/{vendorProfileId}")]
+        public async Task<IActionResult> GetAllServices(int vendorProfileId)
+        {
+            var response = await _serviceService.GetServiceListAsync(vendorProfileId);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
     }
 }

@@ -10,5 +10,7 @@ namespace Hairlytics.Domain.Interfaces
     public interface IServiceRepository
     {
         Task AddService(Service service);
+        Task<List<Service>> GetServiceList(int vendorProfileId);
+
     }
 }

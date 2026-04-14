@@ -11,5 +11,7 @@ namespace Hairlytics.Application.ServiceInterfaces
     {
         Task<string> SaveImage(IFormFile file, string folderName);
         string GetCategoryImage(string fileName);
+
+        string GetImage(string fileName);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,11 @@ namespace Hairlytics.Infrastructure.Repositories
         {
             await _context.Services.AddAsync(service);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Service>> GetServiceList(int vendorProfileId)
+        {
+            return await _context.Services.Where(x => x.VendorProfileId == vendorProfileId && x.Status).ToListAsync();
         }
     }
 }

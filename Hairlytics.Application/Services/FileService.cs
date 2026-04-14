@@ -27,7 +27,14 @@ namespace Hairlytics.Application.Services
         {
             var baseUrl = _config["FileStorage:BasePath"];
             return $"{baseUrl}{fileName}";
-        }       
+        }
+
+
+        public string GetImage(string fileName)
+        {
+            var baseUrl = _config["FileStorage:BasePath"];
+            return $"{baseUrl}{fileName}";
+        }
 
         public async Task<string> SaveImage(IFormFile file, string folderName)
         {

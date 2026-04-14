@@ -1,4 +1,5 @@
-﻿using Hairlytics.Application.DTOs.HelperDTOs;
+﻿using Hairlytics.Application.DTOs.CategoryDTOs;
+using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.ServiceDTOs;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,7 @@ namespace Hairlytics.Application.ServiceInterfaces
     public interface IServiceService
     {
         Task<ServiceResponse<string>> AddServiceAsync(ServiceCreateDto serviceCreateDto);
+        Task<ServiceResponse<List<ServiceResponseDto>>> GetServiceListAsync(int vendorProfileId);
+          
     }
 }

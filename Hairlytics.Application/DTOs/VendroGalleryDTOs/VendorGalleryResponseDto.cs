@@ -17,6 +17,7 @@ namespace Hairlytics.Application.DTOs.VendroGalleryDTOs
         public required string ImageUrl { get; set; }
 
         public bool IsThumbnail { get; set; }
+        public bool IsActive { get; set; } 
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;

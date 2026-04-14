@@ -16,7 +16,7 @@ namespace Hairlytics.Domain.Entities
         public required string ImageUrl { get; set; }
 
         public bool IsThumbnail { get; set; } = false; // ⭐ profile image
-        
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }

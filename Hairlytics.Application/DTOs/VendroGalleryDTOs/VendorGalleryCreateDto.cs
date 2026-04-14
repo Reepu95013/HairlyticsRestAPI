@@ -14,5 +14,6 @@ namespace Hairlytics.Application.DTOs.VendroGalleryDTOs
         public string? ImageUrl { get; set; }
         public required IFormFile ImageFile { get; set; }
         public bool IsThumbnail { get; set; } = false;
+        public bool IsActive { get; set; } = true;
     }
 }
