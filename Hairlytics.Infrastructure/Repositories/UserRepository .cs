@@ -52,6 +52,7 @@ namespace Hairlytics.Infrastructure.Repositories
         public async Task<List<User>> GetUserListAsync(UserRole userRole, int pageNumber, int pageSize)
         {
             return await _context.Users
+                .Include(u => u.VendorProfile) 
                 .Where(u => u.Role == userRole)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

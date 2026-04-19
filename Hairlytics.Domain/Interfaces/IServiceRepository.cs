@@ -11,6 +11,7 @@ namespace Hairlytics.Domain.Interfaces
     {
         Task AddService(Service service);
         Task<List<Service>> GetServiceList(int vendorProfileId);
+        Task<List<Service>> GetServiceList();
 
     }
 }

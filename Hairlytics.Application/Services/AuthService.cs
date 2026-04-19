@@ -210,7 +210,7 @@ namespace Hairlytics.Application.Services
 
             var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
 
-            bool emailexit = existingUser?.Email == dto.Email;
+            bool emailexit = await _authRepository.GetByEmailAsync(dto.Email);
 
             if (emailexit)
             {

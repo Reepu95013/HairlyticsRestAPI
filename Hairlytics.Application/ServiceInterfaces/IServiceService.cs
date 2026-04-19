@@ -13,6 +13,7 @@ namespace Hairlytics.Application.ServiceInterfaces
     {
         Task<ServiceResponse<string>> AddServiceAsync(ServiceCreateDto serviceCreateDto);
         Task<ServiceResponse<List<ServiceResponseDto>>> GetServiceListAsync(int vendorProfileId);
-          
+        Task<ServiceResponse<List<ServiceResponseDto>>> GetServiceListAsync();
+
     }
 }

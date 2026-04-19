@@ -5,6 +5,7 @@ using Hairlytics.Infrastructure.Extensions;
 using Hairlytics.WebApp.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,7 +65,23 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+//app.UseStaticFiles();
+
+
+var basePath = builder.Configuration["FileStorage:BasePath"];
+
+if (string.IsNullOrEmpty(basePath))
+{
+    throw new Exception("FileStorage:BasePath is not configured");
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(basePath),
+    RequestPath = "/HairlyticsStorage"
+});
+
+
 app.UseAntiforgery();
 
 app.UseAuthentication();

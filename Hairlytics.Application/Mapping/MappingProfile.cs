@@ -24,7 +24,10 @@ namespace Hairlytics.Application.Mapping
 
             // Entity → Response DTO
             CreateMap<User, UserCreateDto>();
-            CreateMap<User, UserResponseDto>();
+           
+            CreateMap<User, UserResponseDto>()
+                .ForMember(dest => dest.VendorProfileResponseDto,
+                    opt => opt.MapFrom(src => src.VendorProfile));
 
             // Create DTO → Entity
             CreateMap<UserCreateDto, User>();
@@ -39,6 +42,8 @@ namespace Hairlytics.Application.Mapping
 
             // Entity → Response DTO
             CreateMap<VendorProfile, VendorProfileResponseDto>();
+
+            CreateMap<VendorProfileResponseDto, VendorProfile>();
 
             // Create DTO → Entity
             CreateMap<VendorProfileCreateDto, VendorProfile>();
@@ -63,7 +68,9 @@ namespace Hairlytics.Application.Mapping
             // create service DTO to entity  and entity to dto
 
             CreateMap<ServiceCreateDto, Service>();
-            CreateMap<Service, ServiceResponseDto>();
+            CreateMap<Service, ServiceResponseDto>()
+                .ForMember(dest => dest.CategoryResponseDto,
+                opt => opt.MapFrom(src => src.Category));
 
             // create vendor gallery DTO to entity  and entity to dto
 

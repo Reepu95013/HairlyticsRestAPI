@@ -1,4 +1,5 @@
-﻿using Hairlytics.Domain.Entities;
+﻿using Hairlytics.Application.DTOs.CategoryDTOs;
+using Hairlytics.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace Hairlytics.Application.DTOs.ServiceDTOs
         public bool Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        
+
+        public CategoryResponseDto? CategoryResponseDto { get; set; }
+
     }
 }

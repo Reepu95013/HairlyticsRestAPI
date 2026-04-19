@@ -70,5 +70,26 @@ namespace Hairlytics.Application.Services
             return response;
 
         }
+
+
+        public async Task<ServiceResponse<List<ServiceResponseDto>>> GetServiceListAsync()
+        {
+            var response = new ServiceResponse<List<ServiceResponseDto>>();
+            var services = await _serviceRepository.GetServiceList();
+
+            var data = _mapper.Map<List<ServiceResponseDto>>(services);
+
+            foreach (var item in data)
+            {
+                item.Image = _fileService.GetImage(item.Image);
+            }
+
+            response.Success = true;
+            response.Message = "Success";
+            response.Data = data;
+
+            return response;
+
+        }
     }
 }

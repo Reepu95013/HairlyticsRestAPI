@@ -25,7 +25,16 @@ namespace Hairlytics.Infrastructure.Repositories
 
         public async Task<List<Service>> GetServiceList(int vendorProfileId)
         {
-            return await _context.Services.Where(x => x.VendorProfileId == vendorProfileId && x.Status).ToListAsync();
+            return await _context.Services
+                .Include(c => c.Category)
+                .Where(x => x.VendorProfileId == vendorProfileId && x.Status).ToListAsync();
+        }
+
+        public async Task<List<Service>> GetServiceList()
+        {
+            return await _context.Services
+                .Include(c=>c.Category)
+                .Where(x => x.Status).ToListAsync();
         }
     }
 }
