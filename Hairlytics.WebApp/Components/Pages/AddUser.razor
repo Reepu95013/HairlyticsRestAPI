@@ -1,7 +1,9 @@
 ﻿@attribute [Authorize]
 @page "/Add-User"
+
 @inject IAuthService _authService
 @inject IFileService _fileService
+@inject IEmailService _emailService
 @rendermode InteractiveServer
 
 
@@ -424,6 +426,8 @@
                 return;
             }
 
+            var userpassword = userCreateDto.Password;
+
             var response =  await _authService.RegisterUserAsync(userCreateDto);
 
             if (response.Success)
@@ -435,7 +439,33 @@
                     Message = response.Message
                 });
 
+
+                if (userCreateDto.Role == UserRole.Vendor)
+                {
+                    var mail = new EmailDto
+                      (
+                          userCreateDto.Email,
+                          "No Reply",
+                          EmailBody.EmailStringBody($"Your account has been created successfully. Your username is {userCreateDto.Username} and password is {userpassword}. Please wait for admin approval. Once your account is approved, you will be notified.")
+                      );
+
+                    _emailService.SendEmail(mail);
+                }
+                else
+                {
+                    var mail = new EmailDto
+                     (
+                         userCreateDto.Email,
+                         "No Reply",
+                         EmailBody.EmailStringBody($"Your Account has been created successfuly, and your username is {userCreateDto.Username} and password is {userpassword} .")
+
+                     );
+
+                    _emailService.SendEmail(mail);                    
+                }               
+
                 ClearForm();
+               
             }
             else
             {

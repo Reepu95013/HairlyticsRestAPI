@@ -256,6 +256,7 @@ namespace Hairlytics.Application.Services
                             var vendorProfile = _mapper.Map<VendorProfile>(dto.VendorProfileCreateDto);
                             vendorProfile.CreatedAt = DateTime.Now;
                             vendorProfile.UpdatedAt = DateTime.Now;
+                            vendorProfile.Status = false;
 
                             if (dto.VendorProfileCreateDto.VendorDocumentCreateDto != null)
                             {
