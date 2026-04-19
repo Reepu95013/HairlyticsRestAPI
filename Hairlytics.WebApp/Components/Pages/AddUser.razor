@@ -395,36 +395,42 @@
     {
         try
         {
-
-            var docs = userCreateDto.VendorProfileCreateDto?.VendorDocumentCreateDto;
-
-            if (docs == null || docs.Count < 3)
+            if (userCreateDto.Role == UserRole.Vendor)
             {
-                messages.Add(new ToastMessage
+
+                var docs = userCreateDto.VendorProfileCreateDto?.VendorDocumentCreateDto;
+
+                if (docs == null || docs.Count < 3)
                 {
-                    Type = ToastType.Danger,
-                    Title = "Failed",
-                    Message = "Please add at least 3 documents"
-                });
-                return;
+                    messages.Add(new ToastMessage
+                    {
+                        Type = ToastType.Danger,
+                        Title = "Failed",
+                        Message = "Please add at least 3 documents"
+                    });
+                    return;
+                }
+
+                // 🔥 Check empty fields inside documents
+                var invalidDocs = docs.Any(d =>
+                    string.IsNullOrWhiteSpace(d.DocumentType) ||
+                    d.FilePath == null || d.FilePath.Length == 0
+                );
+
+                if (invalidDocs)
+                {
+                    messages.Add(new ToastMessage
+                    {
+                        Type = ToastType.Danger,
+                        Title = "Failed",
+                        Message = "Please fill all document details and upload files"
+                    });
+                    return;
+                }
+                
             }
 
-            // 🔥 Check empty fields inside documents
-            var invalidDocs = docs.Any(d =>
-                string.IsNullOrWhiteSpace(d.DocumentType) ||
-                d.FilePath == null || d.FilePath.Length == 0
-            );
-
-            if (invalidDocs)
-            {
-                messages.Add(new ToastMessage
-                {
-                    Type = ToastType.Danger,
-                    Title = "Failed",
-                    Message = "Please fill all document details and upload files"
-                });
-                return;
-            }
+           
 
             var userpassword = userCreateDto.Password;
 

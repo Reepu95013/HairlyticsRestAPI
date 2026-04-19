@@ -210,7 +210,7 @@ namespace Hairlytics.Application.Services
 
             var existingUser = await _authRepository.GetByUsernameAsync(dto.Username);
 
-            bool emailexit = await _authRepository.GetByEmailAsync(dto.Email);
+            bool emailexit = await _authRepository.IsExitsEmailAsync(dto.Email);
 
             if (emailexit)
             {
@@ -218,6 +218,17 @@ namespace Hairlytics.Application.Services
                 response.Message = "Email already exists , try with another eamil!";
                 return response;
             }
+
+
+            bool exitsPhone = await _authRepository.IsExitsPhoneAsync(dto.Phone);
+
+            if (exitsPhone)
+            {
+                response.Success = false;
+                response.Message = "Phone Number already exists , try with another phone number!";
+                return response;
+            }
+
 
             if (existingUser != null)
             {
