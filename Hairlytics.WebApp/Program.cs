@@ -68,18 +68,32 @@ app.UseHttpsRedirection();
 //app.UseStaticFiles();
 
 
+//var basePath = builder.Configuration["FileStorage:BasePath"];
+
+//if (string.IsNullOrEmpty(basePath))
+//{
+//    throw new Exception("FileStorage:BasePath is not configured");
+//}
+
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(basePath),
+//    RequestPath = "/HairlyticsStorage"
+//});
+
+
+app.UseStaticFiles();
+
+// 2. Enable your custom storage mapping
 var basePath = builder.Configuration["FileStorage:BasePath"];
-
-if (string.IsNullOrEmpty(basePath))
+if (!string.IsNullOrEmpty(basePath))
 {
-    throw new Exception("FileStorage:BasePath is not configured");
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(basePath),
+        RequestPath = "/HairlyticsStorage"
+    });
 }
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(basePath),
-    RequestPath = "/HairlyticsStorage"
-});
 
 
 app.UseAntiforgery();

@@ -1,4 +1,11 @@
-﻿@page "/Edit-User"
+﻿@attribute [Authorize]
+@page "/Edit-User/{id:int}"
+@inject IUserService _userService
+@inject IFileService _fileService
+@rendermode InteractiveServer
+
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 <div class="page-header">
     <div class="header-title d-flex align-items-center">
@@ -12,34 +19,42 @@
     <h4 class="section-title">User information</h4>
 
     <!-- Blazor Server form simulation: onsubmit prevents page reload, uses JS to mimic navigation -->
-    <form id="editUserForm" onsubmit="event.preventDefault(); handleFormSubmit();">
-        <div class="row">
-            <!-- First Name + Last Name -->
-            <div class="col-md-6 form-row">
-                <label class="form-label"><i class="fas fa-user me-1"></i> First name *</label>
-                <div class="input-group-custom  py-0 px-3">
-                    <input type="text" placeholder="Enter first name" required>
+    @if (_isLoaded == false)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <EditForm Model="@user" OnValidSubmit="HandleUpdate">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div id="editUserForm">
+            <div class="row">
+                <!-- First Name + Last Name -->
+                <div class="col-md-6 form-row">
+                    <label class="form-label"><i class="fas fa-user me-1"></i> First name *</label>
+                    <div class="input-group-custom  py-0 px-3">
+                        <input type="text" placeholder="Enter first name" @bind="@user.Name" required>
+                    </div>
                 </div>
-            </div>
 
 
-            <div class="col-md-6 form-row">
-                <label class="form-label"><i class="fas fa-user me-1"></i> Last name *</label>
-                <div class="input-group-custom py-0 px-3">
-                    <input type="text" placeholder="Enter last name" required>
+                <div class="col-md-6 form-row">
+                    <label class="form-label"><i class="fas fa-user me-1"></i> Last name *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="text" placeholder="Enter last name" @bind="@user.LastName" required>
+                    </div>
                 </div>
+
             </div>
+            
 
-        </div>
-
-        <div class="row">
+            <div class="row">
             <!-- Username -->
-
-
             <div class="col-md-6 form-row">
                 <label class="form-label"><i class="fas fa-envelope me-1"></i> Username *</label>
                 <div class="input-group-custom  py-0 px-3">
-                    <input type="text" placeholder="Username" required>
+                    <input type="text" placeholder="Username" @bind="@user.Username" disabled required>
                 </div>
             </div>
 
@@ -47,18 +62,18 @@
             <div class="col-md-6 form-row">
                 <label class="form-label"><i class="fas fa-envelope me-1"></i> Email address *</label>
                 <div class="input-group-custom  py-0 px-3">
-                    <input type="email" placeholder="name@example.com" required>
+                    <input type="email" placeholder="name@example.com" @bind="@user.Email" disabled required>
                 </div>
 
             </div>
         </div>
 
-        <div class="row">
+            <div class="row">
             <!-- Password -->
-            <div class="col-md-6 form-row">
+            <div class="col-md-6 form-row my-3">
                 <label class="form-label"><i class="fas fa-lock me-1"></i> Password *</label>
                 <div class="input-group-custom  py-0 px-3">
-                    <input type="password" placeholder="••••••••" required>
+                    <input type="password" placeholder="••••••••" @bind="@user.Password" required>
                 </div>
                 <small class="text-secondary">min. 8 characters</small>
             </div>
@@ -66,36 +81,159 @@
             <div class="col-md-6 form-row">
                 <label class="form-label"><i class="fas fa-phone-alt me-1"></i> Phone number *</label>
                 <div class="input-group-custom  py-0 px-3">
-                    <input type="tel" placeholder="+1 234 567 890" required>
+                    <input type="tel" placeholder="+1 234 567 890" @bind="@user.Phone" disabled required>
                 </div>
             </div>
         </div>
 
-        <!-- Role selection: Sub-admin, User, Vendor (selected by default: User) -->
+                <div class="col-md-6 form-row">
+                    <label class="form-label"><i class="fas fa-birthday-cake me-1"></i> Date of Birth *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <InputDate @bind-Value="user.Birth" class="form-control border-0 bg-transparent" />
+                    </div>
+                </div>
+
+            <!-- Role selection: Sub-admin, User, Vendor (selected by default: User) -->
 
 
-        <div class="row row-cols-6">
-            <div class="col-12">
-                <label class="form-label">
-                    <i class="fas fa-envelope me-1"></i> Role *
-                </label>
+            <div class="row row-cols-6">
+                <div class="col-12">
+                    <label class="form-label">
+                        <i class="fas fa-envelope me-1"></i> Role *
+                    </label>
 
-                <select class="input-group-custom w-50 py-3 px-3" name="cars" id="cars">
-                    <option value="volvo">Customer</option>
-                    <option value="saab">Sub-Admin</option>
-                    <option value="opel">Vendor</option>
-                </select>
+                        <div class="input-group-custom py-0 px-3">
+                            <input type="text" @bind="@user.Role" disabled required>
+                        </div>
+                </div>
             </div>
-        </div>
-        <!-- submit + cancel buttons with navigation to "form route" -->
 
-        <div class="d-flex gap-3 mt-4 pt-2">
-            <button class="btn-outline-admin py-lg-2">
+
+
+
+                @if (user.Role == UserRole.Vendor && user.VendorProfileResponseDto != null)
+                {
+                    <div class="row">
+                        <!-- shop name -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"><i class="fa-solid fa-shop"></i> Shop Name *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="Shop Name" @bind="user.VendorProfileResponseDto.ShopName" required>
+                            </div>
+                        </div>
+
+                        <!-- shop Phone Number -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"><i class="fas fa-phone-alt me-1"></i>Telephone *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="tel" placeholder="+1 234 567 890" @bind="user.VendorProfileResponseDto.ShopTelephone" required disabled>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <!-- shop address -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"> <i class="fa-solid fa-location-dot"></i> Address *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="Shop Address" @bind="user.VendorProfileResponseDto.Address" required>
+                            </div>
+                        </div>
+
+                        <!-- shop city -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"> <i class="fa-solid fa-city"></i> City *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="City" @bind="user.VendorProfileResponseDto.City" disabled required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- shop region -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"> <i class="fa-solid fa-archway"></i> Region *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="Shop Region" @bind="user.VendorProfileResponseDto.Region" disabled required>
+                            </div>
+                        </div>
+
+                        <!-- shop city -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"><i class="fa-solid fa-flag"></i> Country *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="Country" @bind="user.VendorProfileResponseDto.Country" disabled required>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row">
+                        <!-- shop region -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"> <i class="fa-solid fa-map-pin"></i> PostalCode *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="PostalCode" @bind="user.VendorProfileResponseDto.PostalCode" disabled required>
+                            </div>
+                        </div>
+
+                        <!-- shop city -->
+                        <div class="col-md-6 form-row">
+                            <label class="form-label"> <i class="fa-solid fa-file"></i> GST Number *</label>
+                            <div class="input-group-custom  py-0 px-3">
+                                <input type="text" placeholder="GST Number" @bind="user.VendorProfileResponseDto.TaxNumber" disabled required>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+                @if (user.VendorProfileResponseDto?.VendorDocumentResponseDto != null)
+                {
+                    <hr class="mt-4">
+
+                    @foreach (var doc in user.VendorProfileResponseDto.VendorDocumentResponseDto)
+                    {
+                        <div class="row align-items-center">
+                            <!-- Document Type -->
+                            <div class="col-md-4">
+                               <p class="fw-bold">@doc.DocumentType</p>
+                               
+                            </div>
+
+                            <!-- File Upload -->
+                            <div class="col-md-5 my-3">
+                                @* <label class="form-label">Upload File</label> *@
+                                <p class="text-success">@doc.FilePath</p>
+
+                                <a href="/HairlyticsStorage/@doc.FilePath"
+                                   target="_blank"
+                                   class="btn-outline-admin py-lg-2 text-decoration-none">
+                                    <i class="fas fa-external-link-alt me-1"></i> View Document
+                                </a>
+                                @* <InputFile class="input-group-custom w-100 py-2 px-3"
+                                           OnChange="e => HandleFileUpload(e, doc)"/> *@
+
+                            </div>
+                           
+                        </div>
+                    }
+
+                }
+            <!-- submit + cancel buttons with navigation to "form route" -->
+
+
+            <div class="d-flex gap-3 mt-4 pt-2">
+            <button type="submit" class="btn-outline-admin py-lg-2">
                 <i class="fas fa-save me-2"></i> Update
             </button>
            </div>
-    </form>
-
+        </div>
+    
+        </EditForm>
+    }
     <!-- additional hint: route simulation (demo) -->
     <hr class="mt-4">
     <div class="d-flex align-items-center justify-content-between text-secondary small">
@@ -105,5 +243,158 @@
 </div>
 
 @code {
+
+    [Parameter]
+    public int id { get; set; }
+    private bool _isLoaded = false;
+    private List<ToastMessage> messages = new();
+
+    public UserResponseDto user = null!;
+    public UserResponseDto loadedUserData = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+         if (_isLoaded) return;
+
+        var userData = await _userService.GetUserAsync(id); 
+        user = userData;
+
+        loadedUserData = new UserResponseDto
+        {
+            Id = userData.Id,
+            Name = userData.Name,
+            LastName = userData.LastName,
+            Email = userData.Email,
+            Username = userData.Username,
+            Password = userData.Password,
+            Phone = userData.Phone,
+            Birth = userData.Birth,
+            Role = userData.Role,
+
+            VendorProfileResponseDto = userData.VendorProfileResponseDto == null ? null : new VendorProfileResponseDto
+            {
+                ShopName = userData.VendorProfileResponseDto.ShopName,
+                ShopTelephone = userData.VendorProfileResponseDto.ShopTelephone,
+                Description = userData.VendorProfileResponseDto.Description,
+                Address = userData.VendorProfileResponseDto.Address,
+                City = userData.VendorProfileResponseDto.City,
+                Region = userData.VendorProfileResponseDto.Region,
+                Country = userData.VendorProfileResponseDto.Country,
+                PostalCode = userData.VendorProfileResponseDto.PostalCode,
+                TaxNumber = userData.VendorProfileResponseDto.TaxNumber,
+                VendorDocumentResponseDto= userData.VendorProfileResponseDto.VendorDocumentResponseDto 
+            }
+        };
+
+        _isLoaded = true;
+
+    }
+
+
+    private async Task HandleUpdate()
+    {
+        var updateDto = new UserUpdateDto();
+
+        updateDto.Id = user.Id;
+        updateDto.Role = user.Role;
+
+        if (user.Name != loadedUserData.Name)
+            updateDto.Name = user.Name;
+
+        if (user.LastName != loadedUserData.LastName)
+            updateDto.LastName = user.LastName;
+
+        if (user.Password != loadedUserData.Password)
+            updateDto.Password = user.Password;
+
+        if (user.Birth != loadedUserData.Birth)
+            updateDto.Birth = user.Birth;
+
+
+        if (user?.VendorProfileResponseDto != null &&
+            user.VendorProfileResponseDto.ShopName != loadedUserData.VendorProfileResponseDto?.ShopName)
+        {
+           
+            updateDto.VendorProfileUpdateDto ??= new VendorProfileUpdateDto();
+            updateDto.VendorProfileUpdateDto.ShopName = user.VendorProfileResponseDto.ShopName;
+        }
+
+        
+
+
+        var response =  await _userService.UpdateUserAsync(updateDto);
+
+        if (response.Success)
+        {
+            messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Success!",
+                Message = response.Data
+            });
+
+        }
+        else
+        {
+
+            messages.Add(new ToastMessage
+            {
+                Type = ToastType.Danger,
+                Title = "Error!",
+                Message = response.Data
+            });
+            
+            
+        }
+
+
+
+    }
+
+
+
+    private async Task<IFormFile> ConvertToIFormFile(IBrowserFile file)
+    {
+        var stream = file.OpenReadStream(10 * 1024 * 1024); // max 10MB
+        var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        ms.Position = 0;
+
+        return new FormFile(ms, 0, ms.Length, file.Name, file.Name)
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = file.ContentType
+        };
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e, VendorDocumentResponseDto doc)
+    {
+        if (!string.IsNullOrWhiteSpace(doc.FilePath))
+        {
+            _fileService.DeleteFile(doc.FilePath);
+
+        }
+
+        var file = e.File;
+
+        // 🔥 Optional validation (size limit 2MB)
+        if (file.Size > 2 * 1024 * 1024)
+        {
+            messages.Add(new ToastMessage
+            {
+                Type = ToastType.Danger,
+                Title = "Error",
+                Message = "File must be less than 2MB"
+            });
+            return;
+        }
+
+        var formFile = await ConvertToIFormFile(file);
+
+        var fileName = await _fileService.SaveFileAsync(formFile, "vendor");
+        doc.FilePath = fileName;
+    }
+
+}
 
 }

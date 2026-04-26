@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Annotations;
+using Hairlytics.Application.ApplicationHelper;
+using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
@@ -18,12 +20,14 @@ namespace Hairlytics.Application.Services
         private readonly IAuthRepository  _authRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UserService(IAuthRepository authRepository,IUserRepository userRepository, IMapper mapper)
+        public UserService(IAuthRepository authRepository,IUserRepository userRepository, IMapper mapper, IPasswordHasher passwordHasher)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _passwordHasher = passwordHasher;
 
         }
 
@@ -53,6 +57,37 @@ namespace Hairlytics.Application.Services
 
             var users = _mapper.Map<List<UserResponseDto>>(user);
             return users;
+        }
+
+        public async Task<ServiceResponse<string>> UpdateUserAsync(UserUpdateDto userUpdateDto)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+                if (userUpdateDto.Password != null)
+                {
+                    string hashedPassword = _passwordHasher.HashPassword(userUpdateDto.Password);
+
+                    userUpdateDto.Password = hashedPassword;
+                }               
+
+                var user = _mapper.Map<User>(userUpdateDto);
+                await _userRepository.UpdateUser(user);
+
+                response.Success = true;
+                response.Message = "Profile updated successfully!";
+                response.Data = "Profile updated successfully!";
+                return response;
+            }
+            catch(Exception ex)
+            {
+                response.Success = true;
+                response.Message = ex.Message;
+                response.Data = "Something went wrong!";
+                return response;
+
+            }
+          
         }
     }
 }

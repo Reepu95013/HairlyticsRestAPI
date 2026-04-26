@@ -179,13 +179,7 @@
 
 
                         <td>
-
-
-                            <i class="fas fa-edit text-secondary me-3"></i>
-
-
-
-
+                            <i class="fas fa-edit text-secondary me-3" @onclick="() => UpdateUser(vendor.Id)"></i>
                             <i class="fas fa-trash-alt text-danger-light"></i>
                         </td>
                     </tr>
@@ -234,7 +228,7 @@
 
 
                         <td>
-                            <i class="fas fa-edit text-secondary me-3"></i>
+                            <i class="fas fa-edit text-secondary me-3" @onclick="()=>UpdateUser(user.Id)"></i>
                             <i class="fas fa-trash-alt text-danger-light"></i>
                         </td>
                     </tr>
@@ -335,6 +329,13 @@
     void GoToAddUser()
     {
         navigationManager.NavigateTo("/Add-User", true);
+    }
+
+
+    void UpdateUser(int id)
+    {
+        navigationManager.NavigateTo($"/Edit-User/{id}", true);
+
     }
 
 

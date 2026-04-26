@@ -34,7 +34,10 @@ namespace Hairlytics.Infrastructure.Repositories
 
         public async Task<User> GetUserAsync(int UserId)
         {
-            return await _context.Users.FirstAsync(u=>u.Id == UserId);
+            var user = await _context.Users
+            .Include(u => u.VendorProfile).ThenInclude(vp => vp.Documents)
+            .FirstOrDefaultAsync(u => u.Id == UserId);
+            return user;
         }
 
         public async Task<IEnumerable<User>>GetUsersAsync() {
@@ -57,6 +60,27 @@ namespace Hairlytics.Infrastructure.Repositories
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            var response = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            if (response != null)
+            {
+                if (user.Name != null) response.Name = user.Name;
+                if (user.LastName != null) response.LastName = user.LastName;
+                if (user.Birth != null) response.Birth = user.Birth;
+                if (user.Password != null) response.Password = user.Password;
+
+                if (user.VendorProfile != null && response.VendorProfile != null)
+                {
+                    response.VendorProfile.ShopName = user.VendorProfile.ShopName;
+                }
+
+               await _context.SaveChangesAsync();
+            }
+
         }
     }
 }

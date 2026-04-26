@@ -33,23 +33,36 @@ namespace Hairlytics.Application.Mapping
             CreateMap<UserCreateDto, User>();
 
             // Update DTO → Entity
-            CreateMap<UserUpdateDto, User>();
+            //CreateMap<UserUpdateDto, User>()
+            //  .ForMember(dest => dest.VendorProfile, opt => opt.Ignore()) 
+            //  .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+
+            CreateMap<UserUpdateDto, User>()
+                .ForMember(dest => dest.VendorProfile, opt => opt.MapFrom(src => src.VendorProfileUpdateDto))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // =========================
             // VENDOR PROFILE MAPPINGS
             // =========================
 
             // Entity → Response DTO
-            CreateMap<VendorProfile, VendorProfileResponseDto>();
+            //CreateMap<VendorProfile, VendorProfileResponseDto>();
+
+            CreateMap<VendorProfile, VendorProfileResponseDto>()
+                .ForMember(dest => dest.VendorDocumentResponseDto,
+                opt => opt.MapFrom(src => src.Documents));
+
 
             CreateMap<VendorProfileResponseDto, VendorProfile>();
 
             // Create DTO → Entity
             CreateMap<VendorProfileCreateDto, VendorProfile>();
-           
+
             // Update DTO → Entity
-            CreateMap<VendorProfileUpdateDto, VendorProfile>();
+            CreateMap<VendorProfileUpdateDto, VendorProfile>()
+              .ForMember(dest => dest.Documents, opt => opt.Ignore()) 
+              .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
 
             // =========================
@@ -58,6 +71,8 @@ namespace Hairlytics.Application.Mapping
 
             CreateMap<VendorDocument, VendorDocumentResponseDto>();           
             CreateMap<VendorDocumentCreateDto, VendorDocument>();
+            CreateMap<VendorDocumentUpdateDto, VendorDocument>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
 
             // create category DTO to Category 

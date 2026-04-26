@@ -16,6 +16,7 @@ namespace Hairlytics.Domain.Interfaces
         Task<User?> GetUserByEmailAsync(string email);
         Task<bool> CheckAdminExitsAsync(UserRole userRole);
         Task<List<User>> GetUserListAsync(UserRole userRole, int pageNumber, int pageSize);
+        Task UpdateUser(User user);
 
     }
 }
