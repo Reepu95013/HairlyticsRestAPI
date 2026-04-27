@@ -4,12 +4,13 @@
 @inject IAuthService _authService
 @inject IFileService _fileService
 @inject IEmailService _emailService
+@inject LoadingService LoadingService
 @rendermode InteractiveServer
 
 
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
-
+<LoaderComponent />
 <div class="page-header">
     <div class="header-title d-flex align-items-center">
         <h2><i class="fas fa-user-plus me-3" style="color:#d4a373;"></i>Add new user</h2>
@@ -395,6 +396,7 @@
     {
         try
         {
+            LoadingService.IsLoading = true;
             if (userCreateDto.Role == UserRole.Vendor)
             {
 
@@ -427,10 +429,10 @@
                     });
                     return;
                 }
-                
+
             }
 
-           
+
 
             var userpassword = userCreateDto.Password;
 
@@ -471,7 +473,7 @@
                 }               
 
                 ClearForm();
-               
+
             }
             else
             {
@@ -486,7 +488,11 @@
         }catch(Exception ex)
         {
             Console.WriteLine(ex.Message);
-            
+
+        }
+        finally
+        {
+            LoadingService.IsLoading = false;
         }
 
    

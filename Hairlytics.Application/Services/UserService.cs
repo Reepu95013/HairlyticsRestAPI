@@ -7,6 +7,7 @@ using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
+using Org.BouncyCastle.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,28 @@ namespace Hairlytics.Application.Services
         public async Task<bool> CheckEmailExitsAsync(string email)
         {
             return await _userRepository.CheckEmailExitsAsync(email);
+        }
+
+        public async Task<ServiceResponse<string>> DeleteUserAsync(int userId)
+        {
+            var response = new ServiceResponse<string>();
+
+            try
+            {
+                await _userRepository.DeleteUser(userId);
+                response.Success = true;
+                response.Message = "User Delete Successfuly!";
+                response.Data = "User Delete Successfuly!";
+                return response;
+            }
+            catch (Exception ex) {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = "something went wrong";
+
+                return response;
+            }
+
         }
 
         public async Task<UserResponseDto> GetUserAsync(int UserId)

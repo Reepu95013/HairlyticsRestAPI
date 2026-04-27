@@ -3,6 +3,7 @@ using Hairlytics.Application.Mapping;
 using Hairlytics.Infrastructure.Database;
 using Hairlytics.Infrastructure.Extensions;
 using Hairlytics.WebApp.Components;
+using Hairlytics.WebApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -18,7 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // add service and repository
-
+builder.Services.AddScoped<LoadingService>();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureRepository();
 builder.Services.AddHttpContextAccessor();

@@ -56,7 +56,7 @@ namespace Hairlytics.Infrastructure.Repositories
         {
             return await _context.Users
                 .Include(u => u.VendorProfile) 
-                .Where(u => u.Role == userRole)
+                .Where(u => u.Role == userRole && u.IsActive)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -65,7 +65,7 @@ namespace Hairlytics.Infrastructure.Repositories
         public async Task UpdateUser(User user)
         {
             var response = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-
+           
             if (response != null)
             {
                 if (user.Name != null) response.Name = user.Name;
@@ -73,14 +73,30 @@ namespace Hairlytics.Infrastructure.Repositories
                 if (user.Birth != null) response.Birth = user.Birth;
                 if (user.Password != null) response.Password = user.Password;
 
+                response.UpdatedAt = DateTime.Now;
+
                 if (user.VendorProfile != null && response.VendorProfile != null)
                 {
                     response.VendorProfile.ShopName = user.VendorProfile.ShopName;
+                    response.VendorProfile.UpdatedAt = DateTime.Now;
                 }
 
+               
                await _context.SaveChangesAsync();
             }
 
+        }
+
+        public async Task DeleteUser(int userId)
+        {
+            var response = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (response != null)
+            {
+                response.IsActive = false;
+                response.UpdatedAt = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }

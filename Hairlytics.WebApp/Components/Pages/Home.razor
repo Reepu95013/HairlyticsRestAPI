@@ -6,8 +6,12 @@
 
 @inject IUserService _userService
 @inject IServiceService _serviceService
+@inject LoadingService LoadingService
 
 
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<LoaderComponent />
 <!-- quick stats cards (handle, overview) -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
@@ -128,8 +132,8 @@
                         <td>@employeeUser.Phone</td>
                         <td>@(employeeUser.IsActive ? "Active" : "Inactive")</td>
                         <td>
-                            <i class="fas fa-edit text-secondary me-3"></i>
-                            <i class="fas fa-trash-alt text-danger-light"></i>
+                            <i class="fas fa-edit text-secondary me-3" @onclick="() => UpdateUser(employeeUser.Id)"></i>
+                            <i class="fas fa-trash-alt text-danger-light" @onclick="() => DeleteUser(employeeUser.Id)"></i>
                         </td>
                     </tr>
                 }
@@ -180,7 +184,7 @@
 
                         <td>
                             <i class="fas fa-edit text-secondary me-3" @onclick="() => UpdateUser(vendor.Id)"></i>
-                            <i class="fas fa-trash-alt text-danger-light"></i>
+                            <i class="fas fa-trash-alt text-danger-light" @onclick="() => DeleteUser(vendor.Id)"></i>
                         </td>
                     </tr>
                 }
@@ -229,7 +233,7 @@
 
                         <td>
                             <i class="fas fa-edit text-secondary me-3" @onclick="()=>UpdateUser(user.Id)"></i>
-                            <i class="fas fa-trash-alt text-danger-light"></i>
+                            <i class="fas fa-trash-alt text-danger-light" @onclick="() => DeleteUser(user.Id)"></i>
                         </td>
                     </tr>
                 }
@@ -306,6 +310,7 @@
     List<UserResponseDto> vendors = new();
     List<UserResponseDto> employee = new();
     List<ServiceResponseDto> services = new(); 
+    private List<ToastMessage> messages = new();
 
 
     async Task LoadUsers()
@@ -326,15 +331,64 @@
         await LoadUsers();
     }
 
-    void GoToAddUser()
+    private void GoToAddUser()
     {
         navigationManager.NavigateTo("/Add-User", true);
     }
 
 
-    void UpdateUser(int id)
+    private void UpdateUser(int id)
     {
         navigationManager.NavigateTo($"/Edit-User/{id}", true);
+
+    }
+
+    private async Task DeleteUser(int id) {
+        LoadingService.IsLoading = true;
+        var response  =   await _userService.DeleteUserAsync(id);
+
+        if (response.Success)
+        {
+
+            messages.Add(new ToastMessage
+            {
+                Type = ToastType.Success,
+                Title = "Success!",
+                Message = response.Data
+            });
+
+            await LoadUsers();
+            LoadingService.IsLoading = false;
+
+        }
+        else
+        {
+            messages.Add(new ToastMessage
+            {
+                Type = ToastType.Danger,
+                Title = "Error!",
+                Message = response.Data
+            });
+            LoadingService.IsLoading = false;
+        }
+    }
+
+    private async Task DeleteUser1(int id)
+    {
+        LoadingService.IsLoading = true;
+
+        await Task.Yield(); // important
+
+        try
+        {
+            await Task.Delay(3000);
+            // await _userService.DeleteUser(id);
+        }
+        finally
+        {
+            LoadingService.IsLoading = false;
+        }
+
 
     }
 

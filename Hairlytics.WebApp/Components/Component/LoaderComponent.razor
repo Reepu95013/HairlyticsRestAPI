@@ -1,0 +1,22 @@
+﻿
+@inject LoadingService LoadingService
+
+@if (LoadingService.IsLoading)
+{
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading</p>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        LoadingService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        LoadingService.OnChange -= StateHasChanged;
+    }
+}
