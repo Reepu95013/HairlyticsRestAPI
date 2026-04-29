@@ -22,6 +22,18 @@ namespace Hairlytics.Infrastructure.TableConfigrations
             builder.HasMany(v => v.Documents)
                    .WithOne(vd => vd.VendorProfile)
                    .HasForeignKey(vd => vd.VendorProfileId);
+
+            builder.HasMany(v => v.VendorStaff)
+                .WithOne(vd => vd.VendorProfile)
+                .HasForeignKey(vd => vd.VendorProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.HasMany(v => v.Bookings)
+               .WithOne(vd => vd.VendorProfile)
+               .HasForeignKey(vd => vd.VendorProfileId)
+               .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

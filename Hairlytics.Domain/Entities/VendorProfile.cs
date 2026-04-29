@@ -29,6 +29,8 @@ namespace Hairlytics.Domain.Entities
         public User? User { get; set; }
         public ICollection<Service> Services { get; set; } = new List<Service>();
         public ICollection<VendorGallery> Gallery { get; set; } = new List<VendorGallery>();
+        public ICollection<VendorStaff> VendorStaff { get; set; } = new List<VendorStaff>();
+        public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
 
     }
