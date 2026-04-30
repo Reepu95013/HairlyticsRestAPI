@@ -4,6 +4,7 @@ using Hairlytics.Application.DTOs.ServiceDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.DTOs.VendorDocumentDTOs;
 using Hairlytics.Application.DTOs.VendorProfileDTOs;
+using Hairlytics.Application.DTOs.VendorStaffDTOs;
 using Hairlytics.Application.DTOs.VendroGalleryDTOs;
 using Hairlytics.Domain.Entities;
 using System;
@@ -22,10 +23,10 @@ namespace Hairlytics.Application.Mapping
             // USER MAPPINGS
             // =========================
 
+            //  Actual to Expected
+
             // Entity → Response DTO
-            CreateMap<User, UserCreateDto>();
-           
-            CreateMap<User, UserResponseDto>()
+           CreateMap<User, UserResponseDto>()
                 .ForMember(dest => dest.VendorProfileResponseDto,
                     opt => opt.MapFrom(src => src.VendorProfile));
 
@@ -93,9 +94,34 @@ namespace Hairlytics.Application.Mapping
             CreateMap<VendorGallery, VendorGalleryResponseDto>();
 
 
+            CreateMap<VendorStaffCreateDto, VendorStaff>()
+                .ForMember(dest => dest.ProfileImageUrl, opt => opt.Ignore()) // 🔥 ignore image
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now))
+                .ForMember(dest => dest.Rating, opt => opt.MapFrom(_ => 0))
+                .ForMember(dest => dest.TotalReviews, opt => opt.MapFrom(_ => 0))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(_ => true))
+                .ForMember(dest => dest.IsAvailable, opt => opt.MapFrom(_ => true));
 
 
+            // entity to dto
+            CreateMap<VendorStaff, VendorStaffResponseDto>();
+
+            CreateMap<StaffAvailability, StaffAvailabilityResponseDto>();
+
+            CreateMap<StaffAvailabilityCreateDto, StaffAvailability>()
+                .ForMember(dest => dest.StaffId, opt => opt.Ignore())
+                .AfterMap((src, dest) =>
+                {
+                    if (src.IsOffDay)
+                    {
+                        dest.StartTime = TimeSpan.Zero;
+                        dest.EndTime = TimeSpan.Zero;
+                    }
+                });
         }
+
+        
 
     }
 }

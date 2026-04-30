@@ -12,5 +12,6 @@ namespace Hairlytics.Domain.Enums
         public const string Category = "category";
         public const string Services = "services";
         public const string VendorGallery = "vendorGallery";
+        public const string Staff = "staff";
     }
 }
