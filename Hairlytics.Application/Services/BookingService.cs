@@ -19,23 +19,41 @@ namespace Hairlytics.Application.Services
         private readonly IVendorStaffRepository _vendorStaffRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper)
+        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository)
         {
             _bookingRepository = bookingRepository;
             _vendorStaffRepository = vendorStaffRepository;
             _serviceRepository = serviceRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
         public async Task<ServiceResponse<string>> CreateBooking(BookingCreateDto bookingCreateDto)
         {
             var response = new ServiceResponse<string>();
+
+            //0. check vendor exit or not
+
+           var isVendor =  await _userRepository.IsVendorActive(bookingCreateDto.VendorProfileId);
+
+            if (isVendor == false)
+            {
+                response.Success = false;
+                response.Message = "Vendor is not active right now!";
+                response.Data = "Failed!";
+                return response;
+
+            }
+
+
             // 1. Validate Services
             if (bookingCreateDto.ServiceIds == null || !bookingCreateDto.ServiceIds.Any())
             {
                 response.Success = false;
                 response.Message = "At least one service is required.";
+                response.Data = "Failed!";
                 return response;
             }
 
@@ -45,6 +63,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "Invalid staff selected.";
+                response.Data = "Failed!";
                 return response;
             }
 
@@ -53,6 +72,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "Past date booking is not allowed.";
+                response.Data = "Failed!";
                 return response;
             }
 
@@ -63,6 +83,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "One or more services are invalid.";
+                response.Data = "Failed!";
                 return response;
             }
 
@@ -93,8 +114,7 @@ namespace Hairlytics.Application.Services
 
             response.Success = true;
             response.Message = "Booking created successfully.";
-
-
+            response.Data = "Success!";
             return response;
         }
     }

@@ -89,14 +89,61 @@ namespace Hairlytics.Infrastructure.Repositories
 
         public async Task DeleteUser(int userId)
         {
-            var response = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (response != null)
+            var user = await _context.Users
+                .Include(u => u.VendorProfile)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
             {
-                response.IsActive = false;
-                response.UpdatedAt = DateTime.Now;
+                throw new Exception("User not found");
+            }
+
+
+            // Soft delete user
+            user.IsActive = false;
+            user.UpdatedAt = DateTime.Now;
+
+            // If vendor, deactivate vendor profile
+            if (user.Role == UserRole.Vendor && user.VendorProfile != null)
+            {
+                user.VendorProfile.Status = false;
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<User> ActiveUserAsync(int userId)
+        {
+            var user = await _context.Users
+                 .Include(u => u.VendorProfile)
+                 .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+
+            // Soft delete user
+            user.IsActive = true;
+            user.UpdatedAt = DateTime.Now;
+
+            // If vendor, deactivate vendor profile
+            if (user.Role == UserRole.Vendor && user.VendorProfile != null)
+            {
+                user.VendorProfile.Status = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<bool> IsVendorActive(int vendorProfileId)
+        {
+            return await _context.VendorProfiles
+            .AnyAsync(v => v.Id == vendorProfileId && v.Status);
+
         }
     }
 }

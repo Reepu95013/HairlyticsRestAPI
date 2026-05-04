@@ -18,6 +18,6 @@ namespace Hairlytics.Application.ServiceInterfaces
         Task<List<UserResponseDto>> GetUsersAsync(UserRole userRole, int pageNumber, int pageSize);
         Task<ServiceResponse<string>> UpdateUserAsync(UserUpdateDto userUpdateDto);
         Task<ServiceResponse<string>> DeleteUserAsync(int userId);
-
+        Task<ServiceResponse<string>> ActiveUser(int userId);
     }
 }

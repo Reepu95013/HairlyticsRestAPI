@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace Hairlytics.Application.Services
 {
@@ -22,14 +23,46 @@ namespace Hairlytics.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IEmailService _emailService;
 
-        public UserService(IAuthRepository authRepository,IUserRepository userRepository, IMapper mapper, IPasswordHasher passwordHasher)
+        public UserService(IAuthRepository authRepository,IUserRepository userRepository, IMapper mapper, IPasswordHasher passwordHasher, IEmailService emailService)
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _emailService = emailService;
+        }
 
+        public async Task<ServiceResponse<string>> ActiveUser(int userId)
+        {
+            var response = new ServiceResponse<string>();
+
+            try
+            {
+               var user = await _userRepository.ActiveUserAsync(userId);
+                var mail = new EmailDto
+                (
+                    user.Email,
+                    "Account Active!",
+                    EmailBody.EmailStringBody($"Your account has been active now!")
+
+                );
+                _emailService.SendEmail(mail);
+
+                response.Success = true;
+                response.Message = "User Active Successfuly!";
+                response.Data = "Success!";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = "something went wrong";
+
+                return response;
+            }
         }
 
         public async Task<bool> CheckEmailExitsAsync(string email)

@@ -1,6 +1,7 @@
 ﻿using Hairlytics.Application.ApplicationHelper;
 using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.ServiceInterfaces;
+using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -38,6 +39,19 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
+        //[Authorize]
+        [HttpPost("active/{userId}")]
+        public async Task<IActionResult> ActiveUserStatus(int userId)
+        {
+            if (userId <= 0)
+                return BadRequest("UserId is required");
+
+            var response = await _userService.ActiveUser(userId);
+
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+
         [Authorize(Roles = "Vendor")]
         [HttpGet("vendor-test")]
         public IActionResult VendorTest()
@@ -65,9 +79,8 @@ namespace HairlyticsRestAPI.Controllers
 
 
         [HttpPost("send")]
-        public async Task<IActionResult> SendEmail(string email)
+        public IActionResult SendEmail(string email)
         {
-
             var emailData = new EmailDto(email, "Hello Gmail Service", EmailBody.EmailStringBody(email));
           
             _emailService.SendEmail(emailData);               

@@ -46,7 +46,7 @@ namespace Hairlytics.Application.Services
                 }
                 catch (Exception ex) {
 
-                    throw;
+                    throw new Exception(ex.Message);
                 }
                 finally
                 {
