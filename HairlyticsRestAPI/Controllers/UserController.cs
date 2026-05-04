@@ -21,7 +21,7 @@ namespace HairlyticsRestAPI.Controllers
             _emailService = emailService;
         }
 
-        [Authorize(Roles = nameof(UserRole.Vendor) + "," + nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Vendor) + "," + nameof(UserRole.Admin))]
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers() {
            var users = await _userService.GetUsersAsync();
@@ -55,11 +55,12 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
-        [Authorize(Roles = "Vendor")]
-        [HttpGet("vendor")]
-        public IActionResult VendorRoute()
+        //[Authorize(Roles = "Vendor")]
+        [HttpGet("get/vendor/{pageNumber}")]
+        public async Task<IActionResult> GetVendors(int pageNumber)
         {
-            return Ok("Vendor route hit");
+          var response  =  await _userService.GetUsersAsync(UserRole.Vendor, pageNumber, 10);          
+          return Ok(response);
         }
 
 

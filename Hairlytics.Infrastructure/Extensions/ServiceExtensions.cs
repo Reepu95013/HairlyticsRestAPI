@@ -25,8 +25,11 @@ namespace Hairlytics.Infrastructure.Extensions
                 services.AddScoped<IServiceService, ServiceService>();
                 services.AddScoped<IVendorGalleryService, VendorGalleryService>();
                 services.AddScoped<IVendorStaffService, VendorStaffService>();
+                services.AddScoped<IBookingService, BookingService>();
+                services.AddScoped<IPaymentService, PaymentService>();
 
-            return services;
+
+                return services;
             }
 
 
@@ -38,9 +41,11 @@ namespace Hairlytics.Infrastructure.Extensions
                 services.AddScoped<IServiceRepository, ServiceRepository>();
                 services.AddScoped<IVendorGalleryRepository, VendorGalleryRepository>();
                 services.AddScoped<IVendorStaffRepository, VendorStaffRepository>();
+                services.AddScoped<IBookingRepository, BookingRepository>();
+                services.AddScoped<IPaymentRepository, PaymentRepository>();
                 
 
-            return services;
+                return services;
             }
 
        

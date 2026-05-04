@@ -17,7 +17,7 @@ namespace Hairlytics.Domain.Entities
 
         public int VendorStaffId { get; set; }
         public VendorStaff? VendorStaff { get; set; }
-        public ICollection<BookingService> BookingService { get; set; } = new List<BookingService>();
+        public ICollection<BookedService> BookedService { get; set; } = new List<BookedService>();
         public DateOnly AppointmentDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }

@@ -33,7 +33,7 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
-        [HttpPost("availability")]
+        [HttpPost("add/availability")]
         public async Task<IActionResult> AddStaffAvailability(int staffId,[FromBody] List<StaffAvailabilityCreateDto> staffAvailabilityCreateDtos)
         {
             if (staffId <= 0)
@@ -67,6 +67,21 @@ namespace HairlyticsRestAPI.Controllers
                 return BadRequest(response);
             }
 
+        }
+
+
+        [HttpPost("get/available/slots")]
+        public async Task<IActionResult> GetAvailableSlots([FromBody] StaffAvailabilitySlotDto dto)
+        {
+            if (dto == null)
+                return BadRequest("Invalid request");
+
+            var response = await _vendorStaffService.GetAvailableSlots(dto);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
         }
 
 

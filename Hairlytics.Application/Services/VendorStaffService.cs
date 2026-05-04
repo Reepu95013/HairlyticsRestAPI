@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hairlytics.Application.DTOs.BookingDTOs;
 using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.ServiceDTOs;
 using Hairlytics.Application.DTOs.VendorStaffDTOs;
@@ -19,12 +20,16 @@ namespace Hairlytics.Application.Services
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
         private readonly IVendorStaffRepository _vendorStaffRepository;
+        private readonly IServiceRepository _serviceRepository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public VendorStaffService(IFileService fileService, IMapper mapper, IVendorStaffRepository vendorStaffRepository)
+        public VendorStaffService(IFileService fileService, IMapper mapper, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IBookingRepository bookingRepository)
         {
             _fileService = fileService;
             _mapper = mapper;
             _vendorStaffRepository = vendorStaffRepository;
+            _serviceRepository = serviceRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<ServiceResponse<string>> AddVendorStafAvailabilityAsync(int staffId, List<StaffAvailabilityCreateDto> StaffAvailabilityCreateDtos)
@@ -98,6 +103,117 @@ namespace Hairlytics.Application.Services
 
             return response;
         }
+
+        public async Task<ServiceResponse<List<TimeSlotDto>>> GetAvailableSlots(StaffAvailabilitySlotDto dto)
+        {
+            var response = new ServiceResponse<List<TimeSlotDto>>();
+
+            // 1. check valid date
+            if (dto.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                response.Success = false;
+                response.Data = []; // empty list
+                response.Message = "Cannot book past date";
+                return response;
+            }
+
+
+            // 1. Get staff
+            var staff = await _vendorStaffRepository.GetVendorStafDetails(dto.StaffId);
+
+            if (staff == null)
+            {
+                response.Success = false;
+                response.Message = "Staff not found";
+                return response;
+            }
+
+            // 2. Get services
+            var services = await _serviceRepository.GetServicesByIdsAsync(dto.ServiceIds);
+
+            if (services == null || !services.Any())
+            {
+                response.Success = false;
+                response.Message = "Invalid services";
+                return response;
+            }
+
+            // 3. Calculate total duration
+            var totalDuration = services.Sum(s => s.Duration);
+            var slotDuration = TimeSpan.FromMinutes(totalDuration);
+
+            // 4. Default working hours
+            var startTime = staff.StartTime;
+            var endTime = staff.EndTime;
+
+            // 5. Check custom availability
+            var dayAvailability = staff.StaffAvailabilities
+                .FirstOrDefault(x => x.DayOfWeek == dto.Date.DayOfWeek);
+
+            if (dayAvailability != null)
+            {
+                if (dayAvailability.IsOffDay)
+                {
+                    response.Success = true;
+                    response.Data = []; // empty slots
+                    response.Message = "Staff is off on this day";
+                    return response;
+                }
+
+                startTime = dayAvailability.StartTime;
+                endTime = dayAvailability.EndTime;
+            }
+
+            // 6. Get bookings
+            var bookings = await _bookingRepository
+                .GetBookings(dto.StaffId, dto.Date);
+
+            // 7. Generate slots
+            var slots = new List<TimeSlotDto>();
+            var current = startTime;
+
+
+            while (current + slotDuration <= endTime)
+            {
+                var slotEnd = current + slotDuration;
+
+                // 🔥 skip past time (today only)
+                if (dto.Date == DateOnly.FromDateTime(DateTime.Today))
+                {
+                    var now = DateTime.Now.TimeOfDay;
+
+                    if (current < now)
+                    {
+                        current = current.Add(slotDuration);
+                        continue;
+                    }
+                }
+
+                var isConflict = bookings.Any(b =>
+                    current < b.EndTime &&
+                    slotEnd > b.StartTime
+                );
+
+                if (!isConflict)
+                {
+                    slots.Add(new TimeSlotDto
+                    {
+                        StartTime = current,
+                        EndTime = slotEnd
+                    });
+                }
+
+                current = current.Add(slotDuration);
+            }
+            // 8. Assign response
+            response.Success = true;
+            response.Data = slots;
+            response.Message = "Available slots fetched";
+
+            return response;
+        }
+
+
 
         public async Task<ServiceResponse<VendorStaffResponseDto>> GetVendorStafDetailsAsync(int staffId)
         {

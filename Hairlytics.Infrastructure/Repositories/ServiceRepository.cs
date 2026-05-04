@@ -36,5 +36,15 @@ namespace Hairlytics.Infrastructure.Repositories
                 .Include(c=>c.Category)
                 .Where(x => x.Status).ToListAsync();
         }
+
+
+        public async Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds)
+        {
+            return await _context.Services
+                .Where(x => serviceIds.Contains(x.Id))
+                .ToListAsync();
+        }
+
+
     }
 }

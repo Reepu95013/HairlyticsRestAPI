@@ -33,7 +33,7 @@ namespace Hairlytics.Infrastructure.Database
         public DbSet<VendorStaff> VendorStaff { get; set; }
         public DbSet<StaffAvailability> StaffAvailability { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<BookingService> BookingService { get; set; }
+        public DbSet<BookedService> BookedServices { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
 

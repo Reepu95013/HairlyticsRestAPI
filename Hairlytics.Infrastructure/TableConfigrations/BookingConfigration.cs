@@ -21,7 +21,7 @@ namespace Hairlytics.Infrastructure.TableConfigrations
               .OnDelete(DeleteBehavior.Cascade);
 
 
-            builder.HasMany(b => b.BookingService)
+            builder.HasMany(b => b.BookedService)
                 .WithOne(b => b.Booking)
                 .HasForeignKey(b => b.BookingId)
                 .OnDelete(DeleteBehavior.Cascade);

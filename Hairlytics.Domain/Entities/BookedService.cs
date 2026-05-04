@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hairlytics.Domain.Entities
 {
-    public class BookingService
+    public class BookedService
     {
         public int Id { get; set; }
         public int BookingId { get; set; }
