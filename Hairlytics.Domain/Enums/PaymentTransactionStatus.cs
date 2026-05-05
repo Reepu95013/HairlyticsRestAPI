@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace Hairlytics.Domain.Enums
 {
     public enum PaymentTransactionStatus
-    {
+    {   
+        None,
         Pending,
         Success,
         Failed

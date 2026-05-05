@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Hairlytics.Domain.Enums
 {
     public enum PaymentGateway
-    {
+    {   None,
         Razorpay,
         Stripe,
         Paytm

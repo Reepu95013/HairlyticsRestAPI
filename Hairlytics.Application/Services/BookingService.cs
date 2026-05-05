@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
 using Hairlytics.Application.DTOs.BookingDTOs;
 using Hairlytics.Application.DTOs.HelperDTOs;
+using Hairlytics.Application.DTOs.PaymentDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Hairlytics.Domain.Enums;
 
 namespace Hairlytics.Application.Services
 {
@@ -20,19 +21,21 @@ namespace Hairlytics.Application.Services
         private readonly IServiceRepository _serviceRepository;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
+        private readonly IPaymentRepository _paymentRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository)
+        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository, IPaymentRepository paymentRepository)
         {
             _bookingRepository = bookingRepository;
             _vendorStaffRepository = vendorStaffRepository;
             _serviceRepository = serviceRepository;
             _userRepository = userRepository;
+            _paymentRepository = paymentRepository;
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<string>> CreateBooking(BookingCreateDto bookingCreateDto)
+        public async Task<ServiceResponse<OnlinePaymentResponseDto>> CreateBooking(BookingCreateDto bookingCreateDto)
         {
-            var response = new ServiceResponse<string>();
+            var response = new ServiceResponse<OnlinePaymentResponseDto>();
 
             //0. check vendor exit or not
 
@@ -42,7 +45,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "Vendor is not active right now!";
-                response.Data = "Failed!";
+                //response.Data = "Failed!";
                 return response;
 
             }
@@ -53,7 +56,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "At least one service is required.";
-                response.Data = "Failed!";
+                //response.Data = "Failed!";
                 return response;
             }
 
@@ -63,7 +66,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "Invalid staff selected.";
-                response.Data = "Failed!";
+                //response.Data = "Failed!";
                 return response;
             }
 
@@ -72,7 +75,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "Past date booking is not allowed.";
-                response.Data = "Failed!";
+                //response.Data = "Failed!";
                 return response;
             }
 
@@ -83,7 +86,7 @@ namespace Hairlytics.Application.Services
             {
                 response.Success = false;
                 response.Message = "One or more services are invalid.";
-                response.Data = "Failed!";
+                //response.Data = "Failed!";
                 return response;
             }
 
@@ -109,13 +112,95 @@ namespace Hairlytics.Application.Services
                 ServiceId = x
             }).ToList();
 
-
             await _bookingRepository.AddBookingServicesAsync(bookingServices);
+
+
+            var payment = new Payment();
+
+            payment.TotalAmount = totalAmount;
+            payment.BookingId = bookingData.Id;
+            payment.UpdatedAt = DateTime.Now;
+            payment.CreatedAt = DateTime.Now;
+            payment.PaymentGateway = PaymentGateway.None;
+
+            if (bookingCreateDto.PaymentMethod == PaymentMethod.Cash) {               
+                payment.PaymentMethod = PaymentMethod.Cash;              
+                payment.Status = PaymentTransactionStatus.None;
+                //response.Data = "Success!";
+
+            }
+            else
+            {
+                payment.PaymentMethod = PaymentMethod.Online;
+                payment.Status = PaymentTransactionStatus.Pending;
+
+                var onlinePayment = new OnlinePaymentResponseDto();
+                onlinePayment.BookingId = bookingData.Id;
+                onlinePayment.TotalAmount = totalAmount;
+
+                onlinePayment.Gateways = GetPaymentGateways();
+
+                response.Data = onlinePayment;
+            }
+
+            await _paymentRepository.AddPaymentAsync(payment);
 
             response.Success = true;
             response.Message = "Booking created successfully.";
-            response.Data = "Success!";
+          
             return response;
         }
+
+
+        public List<PaymentGatewayOptionDto> GetPaymentGateways()
+        {
+            return Enum.GetValues(typeof(PaymentGateway))
+                .Cast<PaymentGateway>()
+                .Where(g => g != PaymentGateway.None) // skip None
+                .Select(g => new PaymentGatewayOptionDto
+                {
+                    Name = GetDisplayName(g),          // Friendly name
+                    Value = g,              // Razorpay, Stripe
+                    Icon = GetGatewayIcon(g)           // Icon mapping
+                })
+                .ToList();
+        }
+
+
+        private string GetDisplayName(PaymentGateway gateway)
+        {
+            return gateway switch
+            {
+                PaymentGateway.Razorpay => "Razorpay",
+                PaymentGateway.Stripe => "Stripe",
+                PaymentGateway.Paytm => "Paytm",
+                _ => gateway.ToString()
+            };
+        }
+
+
+        private static readonly Dictionary<PaymentGateway, string> GatewayIcons = new()
+        {
+                { PaymentGateway.Razorpay, "https://yourcdn.com/icons/razorpay.png" },
+                { PaymentGateway.Stripe, "https://yourcdn.com/icons/stripe.png" },
+                { PaymentGateway.Paytm, "https://yourcdn.com/icons/paytm.png" }
+        };
+
+        private string GetGatewayIcon(PaymentGateway gateway)
+        {
+            return GatewayIcons.TryGetValue(gateway, out var icon)
+                ? icon
+                : "https://yourcdn.com/icons/default.png";
+        }
+
+        public Task<ServiceResponse<string>> CreatePaymentOrder(int bookingId, PaymentGateway paymentGateway)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+        
     }
 }

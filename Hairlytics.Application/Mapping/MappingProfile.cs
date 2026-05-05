@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hairlytics.Application.DTOs.BookingDTOs;
 using Hairlytics.Application.DTOs.CategoryDTOs;
+using Hairlytics.Application.DTOs.PaymentDTOs;
 using Hairlytics.Application.DTOs.ServiceDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.DTOs.VendorDocumentDTOs;
@@ -136,6 +137,12 @@ namespace Hairlytics.Application.Mapping
             .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now))
             .ForMember(dest => dest.Status, opt => opt.Ignore()) // Defaults to Pending in model
             .ForMember(dest => dest.PaymentStatus, opt => opt.Ignore()); // Defaults to Pending
+
+
+
+            CreateMap<PaymentCreateDto, Payment>()
+           .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.Now))
+           .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
         }
 
         
