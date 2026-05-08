@@ -1,4 +1,5 @@
 ﻿using Hairlytics.Application.DTOs.BookingDTOs;
+using Hairlytics.Application.DTOs.RazorpayDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Enums;
 using Microsoft.AspNetCore.Http;
@@ -11,8 +12,10 @@ namespace HairlyticsRestAPI.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
-        public BookingController(IBookingService bookingService) {
+        private readonly IRazorpayService _razorpayService;
+        public BookingController(IBookingService bookingService, IRazorpayService razorpayService) {
              _bookingService=bookingService;
+            _razorpayService=razorpayService;
         }
 
         [HttpPost("create")]
@@ -37,6 +40,18 @@ namespace HairlyticsRestAPI.Controllers
                 return BadRequest(response);
 
             return Ok(response);
+        }
+
+
+        [HttpPost("verify/razorpay/payment")]
+        public async Task<IActionResult> VerifyPayment(VerifyPaymentDto verifyPaymentDto)
+        {
+            var response = await _razorpayService.VerifyPayment(verifyPaymentDto);
+
+            if (response.Success)
+                return Ok(response);
+
+            return BadRequest(response);
         }
     }
 }

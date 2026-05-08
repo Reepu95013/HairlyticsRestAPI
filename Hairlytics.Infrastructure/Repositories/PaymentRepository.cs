@@ -1,4 +1,5 @@
 ﻿using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,32 @@ namespace Hairlytics.Infrastructure.Repositories
         public async Task AddPaymentAsync(Payment payment)
         {
             await _context.Payments.AddAsync(payment);
+            await _context.SaveChangesAsync();
+        }
+       
+
+        public async Task<Payment> GetPaymentByBookingIdAsync(int bookingId)
+        {
+            var payment = await _context.Payments
+                            .Where(p => p.BookingId == bookingId && p.Status !=PaymentTransactionStatus.Failed)
+                            .OrderByDescending(p => p.CreatedAt)
+                            .FirstOrDefaultAsync();
+
+            if (payment == null)
+                throw new Exception("payment not found!");
+
+            return payment;
+
+        }
+
+        public Task<Payment> GetPaymentByOrderIdAsync(string orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task UpdatePaymentAsync(Payment payment)
+        {
+             _context.Payments.Update(payment);
             await _context.SaveChangesAsync();
         }
     }

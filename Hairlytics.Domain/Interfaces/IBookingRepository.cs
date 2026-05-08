@@ -12,5 +12,10 @@ namespace Hairlytics.Domain.Interfaces
         Task CreateBookingAsync(Booking booking);
         Task<List<Booking>>GetBookings(int staffId, DateOnly date);
         Task AddBookingServicesAsync(List<BookedService> BookedService);
+        Task UpdateBookAsync(Booking booking);
+        Task <Booking>GetBookingDetailByBookingIdAsync(int bookingId);
+
+
+       
     }
 }

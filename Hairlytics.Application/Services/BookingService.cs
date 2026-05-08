@@ -2,6 +2,7 @@
 using Hairlytics.Application.DTOs.BookingDTOs;
 using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.PaymentDTOs;
+using Hairlytics.Application.DTOs.RazorpayDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Enums;
@@ -22,8 +23,9 @@ namespace Hairlytics.Application.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IRazorpayService _razorpayService;
 
-        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository, IPaymentRepository paymentRepository)
+        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository, IPaymentRepository paymentRepository, IRazorpayService razorpayService)
         {
             _bookingRepository = bookingRepository;
             _vendorStaffRepository = vendorStaffRepository;
@@ -31,6 +33,7 @@ namespace Hairlytics.Application.Services
             _userRepository = userRepository;
             _paymentRepository = paymentRepository;
             _mapper = mapper;
+            _razorpayService = razorpayService;
         }
 
         public async Task<ServiceResponse<OnlinePaymentResponseDto>> CreateBooking(BookingCreateDto bookingCreateDto)
@@ -104,42 +107,30 @@ namespace Hairlytics.Application.Services
             }
 
             await _bookingRepository.CreateBookingAsync(bookingData);
-
-            // 8. Save Booking Services
-            var bookingServices = bookingCreateDto.ServiceIds.Select(x => new BookedService
-            {
-                BookingId = bookingData.Id,
-                ServiceId = x
-            }).ToList();
-
-            await _bookingRepository.AddBookingServicesAsync(bookingServices);
-
-
+            
             var payment = new Payment();
-
             payment.TotalAmount = totalAmount;
             payment.BookingId = bookingData.Id;
             payment.UpdatedAt = DateTime.Now;
             payment.CreatedAt = DateTime.Now;
             payment.PaymentGateway = PaymentGateway.None;
 
+
+            var onlinePayment = new OnlinePaymentResponseDto();
+            onlinePayment.BookingId = bookingData.Id;
+            onlinePayment.TotalAmount = totalAmount;
+
             if (bookingCreateDto.PaymentMethod == PaymentMethod.Cash) {               
                 payment.PaymentMethod = PaymentMethod.Cash;              
                 payment.Status = PaymentTransactionStatus.None;
-                //response.Data = "Success!";
+                response.Data = onlinePayment;
 
             }
             else
             {
                 payment.PaymentMethod = PaymentMethod.Online;
                 payment.Status = PaymentTransactionStatus.Pending;
-
-                var onlinePayment = new OnlinePaymentResponseDto();
-                onlinePayment.BookingId = bookingData.Id;
-                onlinePayment.TotalAmount = totalAmount;
-
                 onlinePayment.Gateways = GetPaymentGateways();
-
                 response.Data = onlinePayment;
             }
 
@@ -193,14 +184,77 @@ namespace Hairlytics.Application.Services
                 : "https://yourcdn.com/icons/default.png";
         }
 
-        public Task<ServiceResponse<string>> CreatePaymentOrder(int bookingId, PaymentGateway paymentGateway)
+        public async Task<ServiceResponse<RazorpayCreateOrderResponse>> CreatePaymentOrder(int bookingId, PaymentGateway paymentGateway)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<RazorpayCreateOrderResponse>();
+
+            try
+            {
+                // 1. Get payment by bookingId
+                var payment = await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);                
+
+                if (payment == null)
+                {
+                    response.Success = false;
+                    response.Message = "Payment not found for this booking.";
+                    return response;
+                }
+
+                if(payment.PaymentMethod == PaymentMethod.Cash)
+                {
+                    response.Success = false;
+                    response.Message = "Booking Id is wrong! please check!";
+                    return response;
+                }
+
+                // 2. Update selected gateway
+                payment.PaymentGateway = paymentGateway;
+                payment.UpdatedAt = DateTime.Now;
+
+                var orderResponse = new RazorpayCreateOrderResponse();               
+
+                // 3. Create order based on gateway
+                if (paymentGateway == PaymentGateway.Razorpay)
+                {
+                    var order = await _razorpayService.CreateOrder(payment.TotalAmount);
+
+                    orderResponse.OrderId = order.OrderId;
+                    orderResponse.Currency = order.Currency;
+                    orderResponse.Amount = order.Amount;
+                    orderResponse.Receipt = order.Receipt;
+                    orderResponse.key = order.key; 
+
+                   
+                }
+                else if (paymentGateway == PaymentGateway.Stripe)
+                {
+                    // Future implementation
+                    throw new Exception("Stripe not implemented yet.");
+                }
+                else if (paymentGateway == PaymentGateway.Paytm)
+                {
+                    // Future implementation
+                    throw new Exception("Paytm not implemented yet.");
+                }
+
+                // 4. Save payment update
+                await _paymentRepository.UpdatePaymentAsync(payment);
+
+                // 5. Return response
+                response.Success = true;
+                response.Message = "Payment order created successfully.";
+                response.Data = orderResponse;
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
         }
 
-
-
-
-        
     }
 }
