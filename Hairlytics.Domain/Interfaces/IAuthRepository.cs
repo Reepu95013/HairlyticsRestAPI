@@ -19,6 +19,6 @@ namespace Hairlytics.Domain.Interfaces
         Task<RefreshToken?> RefreshToken (int userId, string refreshToken);
         Task ForgotPassword(ForgotPassword forgotPassword);
         Task<ForgotPassword?> GetResetPasswordData(string email);
-        //Task<bool> GetVerifyOTP();
+        Task RegisterPhoneNumber(RegisterPhoneNumber registerPhoneNumber);
     }
 }

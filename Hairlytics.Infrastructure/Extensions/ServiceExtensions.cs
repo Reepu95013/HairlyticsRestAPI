@@ -28,6 +28,7 @@ namespace Hairlytics.Infrastructure.Extensions
                 services.AddScoped<IBookingService, BookingService>();
                 services.AddScoped<IPaymentService, PaymentService>();
                 services.AddScoped<IRazorpayService, RazorpayService>();
+                services.AddScoped<ISmsService, SmsService>();
 
 
                 return services;

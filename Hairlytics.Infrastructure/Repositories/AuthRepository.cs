@@ -4,11 +4,13 @@ using Hairlytics.Domain.Interfaces;
 using Hairlytics.Infrastructure.Database;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace Hairlytics.Infrastructure.Repositories
 {
@@ -102,6 +104,35 @@ namespace Hairlytics.Infrastructure.Repositories
             var data = await _context.ForgotPassword
                 .FirstOrDefaultAsync(u => u.Email == email && !u.Revoke);
             return data;
+        }
+
+        public async Task RegisterPhoneNumber(RegisterPhoneNumber registerPhoneNumber)
+        {
+            // Check existing user
+            var phoneNumber = await _context.RegisterPhoneNumbers
+                .FirstOrDefaultAsync(x => x.PhoneNumber == registerPhoneNumber.PhoneNumber);
+
+            // If already verified
+            if (phoneNumber != null && phoneNumber.IsVerified)
+            {
+                throw new Exception("Phone number already registered!");
+            }
+
+
+            if (phoneNumber != null)
+            {
+                phoneNumber.OtpCode = registerPhoneNumber.OtpCode;
+                phoneNumber.ExpiryTime = registerPhoneNumber.ExpiryTime;
+
+                _context.RegisterPhoneNumbers.Update(phoneNumber);
+            }
+            else
+            {
+                await _context.RegisterPhoneNumbers.AddAsync(registerPhoneNumber);
+            }
+
+            await _context.SaveChangesAsync();
+
         }
     }
 }

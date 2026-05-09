@@ -92,6 +92,21 @@ namespace HairlyticsRestAPI.Controllers
             }
 
             return Ok(data);
-        }        
+        }
+
+
+
+        
+        [HttpPost("send/otp/{phoneNumber}")]
+        public async Task<IActionResult> RegisterPhoneNumber(string phoneNumber)
+        {
+            var data = await _authService.SendPhoneOtp(phoneNumber);
+            if (data.Success == false)
+            {
+                return BadRequest(data.Message);
+            }
+
+            return Ok(data);
+        }
     }
 }

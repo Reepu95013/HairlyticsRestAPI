@@ -22,6 +22,7 @@ namespace Hairlytics.Application.ServiceInterfaces
         Task<UserLoginDto?> LoginAdminAsync(LoginDto request);
 
         Task<ServiceResponse<TokenResponseDto>> RegisterAdminAsync(UserCreateDto dto);
+        Task<ServiceResponse<string>> SendPhoneOtp(string phoneNumber);
 
 
         //Task LogoutAsync();

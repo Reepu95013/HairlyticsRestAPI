@@ -28,9 +28,10 @@ namespace Hairlytics.Application.Services
         private readonly IJwtService _jwtService;
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
+        private readonly ISmsService _smsService;
 
 
-        public AuthService(IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService, IUserRepository userRepository, IEmailService emailService)
+        public AuthService(IAuthRepository authRepository, IMapper mapper, IPasswordHasher passwordHasher, IJwtService jwtService, IUserRepository userRepository, IEmailService emailService, ISmsService smsService)
         {
             _authRepository = authRepository;
             _mapper = mapper;
@@ -38,6 +39,7 @@ namespace Hairlytics.Application.Services
             _jwtService = jwtService;
             _userRepository = userRepository;
             _emailService = emailService;
+            _smsService = smsService;
 
         }
 
@@ -584,6 +586,47 @@ namespace Hairlytics.Application.Services
 
                 }
 
+            }
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<string>> SendPhoneOtp(string phoneNumber)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+
+                // Generate OTP
+                var otp = new Random().Next(100000, 999999).ToString();
+
+
+                RegisterPhoneNumber data = new RegisterPhoneNumber()
+                {
+
+                    OtpCode = otp,
+                    PhoneNumber = phoneNumber,
+                    ExpiryTime = DateTime.Now.AddMinutes(5),
+
+                };
+
+                await _authRepository.RegisterPhoneNumber(data);
+
+                await _smsService.SendOtpSms(phoneNumber, otp);
+
+
+                response.Success = true;
+                response.Message = "Success!";
+                response.Data = "Otp has been sent your phone number!";
+
+
+
+            }
+            catch (Exception ex) { 
+                response.Success = false;
+                response.Message = "Failed!";
+                response.Data = ex.Message;
+            
             }
 
             return response;
