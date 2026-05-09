@@ -15,6 +15,11 @@ namespace Hairlytics.Application.ServiceInterfaces
     {
         Task <ServiceResponse<OnlinePaymentResponseDto>> CreateBooking(BookingCreateDto bookingCreateDto) ;
         Task<ServiceResponse<RazorpayCreateOrderResponse>> CreatePaymentOrder(int bookingId, PaymentGateway paymentGateway);
-
+        Task<ServiceResponse<string>> CancelBooking(int bookingId);
+        Task<ServiceResponse<List<BookingResponseDto>>> GetBookingList(PaginationDto paginationDto);
+        Task<ServiceResponse<List<BookingResponseDto>>> GetCancelledBookingList(PaginationDto paginationDto);
+        Task<ServiceResponse<List<BookingResponseDto>>> GetBookingListByVendor(PaginationDto paginationDto, int vendorId);
+        Task<ServiceResponse<List<BookingResponseDto>>> GetBookingListByStaff(PaginationDto paginationDto, int staffId);
+        Task<ServiceResponse<List<BookingResponseDto>>> GetBookingListByUser(PaginationDto paginationDto, int userId);
     }
 }

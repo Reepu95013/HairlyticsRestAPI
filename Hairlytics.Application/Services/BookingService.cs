@@ -24,8 +24,9 @@ namespace Hairlytics.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IRazorpayService _razorpayService;
+        private readonly IGlobalRepository _globalRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository, IPaymentRepository paymentRepository, IRazorpayService razorpayService)
+        public BookingService(IBookingRepository bookingRepository, IVendorStaffRepository vendorStaffRepository, IServiceRepository serviceRepository, IMapper mapper, IUserRepository userRepository, IPaymentRepository paymentRepository, IRazorpayService razorpayService, IGlobalRepository globalRepository)
         {
             _bookingRepository = bookingRepository;
             _vendorStaffRepository = vendorStaffRepository;
@@ -34,6 +35,7 @@ namespace Hairlytics.Application.Services
             _paymentRepository = paymentRepository;
             _mapper = mapper;
             _razorpayService = razorpayService;
+            _globalRepository = globalRepository;
         }
 
         public async Task<ServiceResponse<OnlinePaymentResponseDto>> CreateBooking(BookingCreateDto bookingCreateDto)
@@ -255,6 +257,126 @@ namespace Hairlytics.Application.Services
                 return response;
             }
         }
+
+        public async Task<ServiceResponse<List<BookingResponseDto>>> GetBookingList(PaginationDto paginationDto)
+        {
+            var response =new ServiceResponse<List<BookingResponseDto>>();
+
+            var bookings  =   await _bookingRepository.GetAllBookingAsync(paginationDto.PageNumber, paginationDto.PageSize);
+
+            var bookingList  =    _mapper.Map<List<BookingResponseDto>>(bookings);
+
+            response.Success = true;
+            response.Message = "Booking List!";
+            response.Data = bookingList;
+
+            return response;           
+            
+        }
+
+
+        public async Task<ServiceResponse<List<BookingResponseDto>>> GetCancelledBookingList(PaginationDto paginationDto)
+        {
+            var response = new ServiceResponse<List<BookingResponseDto>>();
+
+            var bookings = await _bookingRepository.GetAllCancelledBookingAsync(paginationDto.PageNumber, paginationDto.PageSize);
+
+            var bookingList = _mapper.Map<List<BookingResponseDto>>(bookings);
+
+            response.Success = true;
+            response.Message = "Cancelled Booking List!";
+            response.Data = bookingList;
+
+            return response;
+
+        }
+
+
+        public async Task<ServiceResponse<List<BookingResponseDto>>> GetBookingListByVendor(PaginationDto paginationDto, int vendorId)
+        {
+            var response = new ServiceResponse<List<BookingResponseDto>>();
+
+            var bookings = await _bookingRepository.GetAllBookingByVendorAsync(paginationDto.PageNumber, paginationDto.PageSize, vendorId);
+
+            var bookingList = _mapper.Map<List<BookingResponseDto>>(bookings);
+
+            response.Success = true;
+            response.Message = " Booking List!";
+            response.Data = bookingList;
+
+            return response;
+
+        }
+        public async Task<ServiceResponse<List<BookingResponseDto>>> GetBookingListByStaff(PaginationDto paginationDto, int staffId)
+        {
+            var response = new ServiceResponse<List<BookingResponseDto>>();
+
+            var bookings = await _bookingRepository.GetAllBookingByStaffAsync(paginationDto.PageNumber, paginationDto.PageSize, staffId);
+
+            var bookingList = _mapper.Map<List<BookingResponseDto>>(bookings);
+
+            response.Success = true;
+            response.Message = " Booking List!";
+            response.Data = bookingList;
+
+            return response;
+
+        }
+        public async Task<ServiceResponse<List<BookingResponseDto>>> GetBookingListByUser(PaginationDto paginationDto, int userId)
+        {
+            var response = new ServiceResponse<List<BookingResponseDto>>();
+
+            var bookings = await _bookingRepository.GetAllBookingByUserAsync(paginationDto.PageNumber, paginationDto.PageSize, userId);
+
+            var bookingList = _mapper.Map<List<BookingResponseDto>>(bookings);
+
+            response.Success = true;
+            response.Message = " Booking List!";
+            response.Data = bookingList;
+
+            return response;
+
+        }
+
+        public async Task<ServiceResponse<string>> CancelBooking(int bookingId)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+               var booking =  await _bookingRepository.GetBookingDetailByBookingIdAsync(bookingId);
+                booking.Status = BookingStatus.Cancelled;
+                booking.UpdatedAt = DateTime.Now;
+
+                if (booking.PaymentMethod == PaymentMethod.Online)
+                {
+                    PaymentRefund();
+                }
+
+              await _globalRepository.SaveDbContextAsync();
+
+                response.Success = true;
+                response.Message = "Booking cancelled successfully";
+                response.Data = booking.Id.ToString();
+                
+            }
+            catch(Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = ex.Message;
+
+            }
+
+            return response;
+
+        }
+
+
+        private void PaymentRefund()
+        {
+
+        }
+
 
     }
 }

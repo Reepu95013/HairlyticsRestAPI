@@ -1,4 +1,5 @@
 ﻿using Hairlytics.Application.DTOs.BookingDTOs;
+using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.RazorpayDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Enums;
@@ -43,6 +44,18 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
+        [HttpPost("cancel/{bookingId}")]
+        public async Task<IActionResult> CancelBooking(int bookingId)
+        {
+            var response = await _bookingService.CancelBooking(bookingId);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
+
+
         [HttpPost("verify/razorpay/payment")]
         public async Task<IActionResult> VerifyPayment(VerifyPaymentDto verifyPaymentDto)
         {
@@ -53,5 +66,54 @@ namespace HairlyticsRestAPI.Controllers
 
             return BadRequest(response);
         }
+
+
+        // access only admin
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllBooking([FromQuery] PaginationDto paginationDto)
+        {
+            var response = await _bookingService.GetBookingList(paginationDto);
+
+            return Ok(response);
+        }
+
+        // access only admin
+        [HttpGet("cancel/list")]
+        public async Task<IActionResult> GetAllCancelledBooking([FromQuery] PaginationDto paginationDto)
+        {
+            var response = await _bookingService.GetCancelledBookingList(paginationDto);
+
+            return Ok(response);
+        }
+
+
+        // access admin, vendor, 
+        [HttpGet("list/vendor/{vendorId}")]
+        public async Task<IActionResult> GetAllBookingByVendor([FromQuery] PaginationDto paginationDto , int vendorId)
+        {
+            var response = await _bookingService.GetBookingListByVendor(paginationDto, vendorId);
+
+            return Ok(response);
+        }
+
+        // access admin, vendor, 
+        [HttpGet("list/staff/{staffId}")]
+        public async Task<IActionResult> GetAllBookingByStaff([FromQuery] PaginationDto paginationDto, int staffId)
+        {
+            var response = await _bookingService.GetBookingListByStaff(paginationDto, staffId);
+
+            return Ok(response);
+        }
+
+
+        // access admin, user
+        [HttpGet("list/user/{userId}")]
+        public async Task<IActionResult> GetAllBookingByUser([FromQuery] PaginationDto paginationDto, int userId)
+        {
+            var response = await _bookingService.GetBookingListByUser(paginationDto, userId);
+
+            return Ok(response);
+        }
+
     }
 }

@@ -44,6 +44,7 @@ namespace Hairlytics.Infrastructure.Extensions
                 services.AddScoped<IVendorStaffRepository, VendorStaffRepository>();
                 services.AddScoped<IBookingRepository, BookingRepository>();
                 services.AddScoped<IPaymentRepository, PaymentRepository>();
+                services.AddScoped<IGlobalRepository, GlobalRepository>();
                 
 
                 return services;

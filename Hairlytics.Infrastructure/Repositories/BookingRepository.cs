@@ -58,10 +58,85 @@ namespace Hairlytics.Infrastructure.Repositories
                          b.Status != BookingStatus.Cancelled);
 
             if (booking == null)
-                throw new Exception("not fount booking");
+                throw new Exception("not found booking");
 
 
             return booking;
         }
+
+        public async Task<List<Booking>> GetAllBookingAsync(int pageNumber, int pageSize)
+        {
+            var bookings = await _context.Bookings
+                .Where(b=>b.Status != BookingStatus.Cancelled)
+                .Include(b => b.Payments)
+                .Include(b => b.BookedService)
+                    .ThenInclude(bs => bs.Service)
+                
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return bookings;
+        }
+
+
+        public async Task<List<Booking>> GetAllCancelledBookingAsync(int pageNumber, int pageSize)
+        {
+            var bookings = await _context.Bookings
+                .Where(b => b.Status == BookingStatus.Cancelled)
+                .Include(b => b.Payments)
+                .Include(b => b.BookedService)
+                    .ThenInclude(bs => bs.Service)
+
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return bookings;
+        }
+        public async Task<List<Booking>> GetAllBookingByVendorAsync(int pageNumber, int pageSize, int vendorId)
+        {
+            var bookings = await _context.Bookings
+                .Where(b => b.VendorProfileId == vendorId)
+                .Include(b => b.Payments)
+                .Include(b => b.BookedService)
+                    .ThenInclude(bs => bs.Service)
+
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return bookings;
+        }
+        public async Task<List<Booking>> GetAllBookingByStaffAsync(int pageNumber, int pageSize, int staffId)
+        {
+            var bookings = await _context.Bookings
+                .Where(b => b.VendorStaffId == staffId)
+                .Include(b => b.Payments)
+                .Include(b => b.BookedService)
+                    .ThenInclude(bs => bs.Service)
+
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return bookings;
+        }
+        public async Task<List<Booking>> GetAllBookingByUserAsync(int pageNumber, int pageSize, int userId)
+        {
+            var bookings = await _context.Bookings
+                .Where(b => b.CustomerId == userId)
+                .Include(b => b.Payments)
+                .Include(b => b.BookedService)
+                    .ThenInclude(bs => bs.Service)
+
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return bookings;
+        }
+
+       
     }
 }
