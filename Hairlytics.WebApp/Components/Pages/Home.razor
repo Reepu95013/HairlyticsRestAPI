@@ -5,6 +5,7 @@
 
 
 @inject IUserService _userService
+@inject IHelperService _helperService
 @inject IServiceService _serviceService
 @inject LoadingService LoadingService
 
@@ -19,7 +20,7 @@
             <div class="stat-icon me-3"><i class="fas fa-cut"></i></div>
             <div>
                 <span class="text-secondary-emphasis small text-uppercase">Today's bookings</span>
-                <h3 class="fw-bold mb-0">24</h3>
+                <h3 class="fw-bold mb-0">@dashboardDto.TotalTodayBookings</h3>
             </div>
         </div>
     </div>
@@ -29,7 +30,7 @@
             <div class="stat-icon me-3"><i class="fas fa-spa"></i></div>
             <div>
                 <span class="text-secondary-emphasis small">SERVICES</span>
-                <h3 class="fw-bold mb-0">18</h3>
+                <h3 class="fw-bold mb-0">@dashboardDto.TotalServices</h3>
             </div>
         </div>
     </div>
@@ -38,7 +39,7 @@
             <div class="stat-icon me-3"><i class="fa-solid fa-shapes"></i></div>
             <div>
                 <span class="text-secondary-emphasis small">CATEGORY</span>
-                <h3 class="fw-bold mb-0">5</h3>
+                <h3 class="fw-bold mb-0">@dashboardDto.TotalCategories</h3>
             </div>
         </div>
     </div>
@@ -51,7 +52,7 @@
             <div class="stat-icon me-3"><i class="fa-solid fa-shop"></i></div>
             <div>
                 <span class="text-secondary-emphasis small text-uppercase">ACTIVE VENDOR</span>
-                <h3 class="fw-bold mb-0">24</h3>
+                <h3 class="fw-bold mb-0">@dashboardDto.TotalVendors</h3>
             </div>
         </div>
     </div>
@@ -60,7 +61,7 @@
             <div class="stat-icon me-3"><i class="fas fa-user-friends"></i></div>
             <div>
                 <span class="text-secondary-emphasis small">ACTIVE CUSTOMER</span>
-                <h3 class="fw-bold mb-0">12</h3>
+                <h3 class="fw-bold mb-0">@dashboardDto.TotalCustomers</h3>
             </div>
         </div>
     </div>
@@ -69,7 +70,7 @@
             <div class="stat-icon me-3"><i class="fa-solid fa-user"></i></div>
             <div>
                 <span class="text-secondary-emphasis small">ACTIVE EMPLOYEES</span>
-                <h3 class="fw-bold mb-0">12</h3>
+                <h3 class="fw-bold mb-0">@dashboardDto.TotalSubAdmins</h3>
             </div>
         </div>
     </div>
@@ -289,16 +290,20 @@
 
 
 @code {
-
+    DashboardDto dashboardDto = new(); 
     List<UserResponseDto> users = new();
     List<UserResponseDto> vendors = new();
     List<UserResponseDto> employee = new();
     List<ServiceResponseDto> services = new(); 
+
     private List<ToastMessage> messages = new();
+
+
 
 
     async Task LoadUsers()
     {
+        dashboardDto = await _helperService.GetDashboardDataCounts();
         users = await _userService.GetUsersAsync(UserRole.Customer, 1, 10);
         vendors = await _userService.GetUsersAsync(UserRole.Vendor, 1, 10);
         employee = await _userService.GetUsersAsync(UserRole.SubAdmin, 1, 10);

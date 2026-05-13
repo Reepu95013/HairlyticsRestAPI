@@ -20,6 +20,7 @@ namespace Hairlytics.Domain.Interfaces
         Task DeleteUser(int userId);
         Task<User> ActiveUserAsync(int userId);
         Task<bool> IsVendorActive(int vendorProfileId);
+        Task<Dashboard>IGetDashboardAsync();
 
     }
 }

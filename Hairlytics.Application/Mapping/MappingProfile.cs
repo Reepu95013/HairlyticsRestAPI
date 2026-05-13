@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hairlytics.Application.DTOs.BookingDTOs;
 using Hairlytics.Application.DTOs.CategoryDTOs;
+using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.PaymentDTOs;
 using Hairlytics.Application.DTOs.ServiceDTOs;
 using Hairlytics.Application.DTOs.UserDTOs;
@@ -187,9 +188,16 @@ namespace Hairlytics.Application.Mapping
            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.Now));
 
             CreateMap<Payment, PaymentResponseDto>();
+
+
+            // =========================
+            // DASHBOARD MAPPINGS
+            // =========================
+
+            CreateMap<Dashboard,DashboardDto >();
         }
 
-        
+
 
     }
 }

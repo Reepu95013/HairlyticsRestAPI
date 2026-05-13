@@ -145,5 +145,27 @@ namespace Hairlytics.Infrastructure.Repositories
             .AnyAsync(v => v.Id == vendorProfileId && v.Status);
 
         }
+
+        public async Task<Dashboard> IGetDashboardAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var dashboard = new Dashboard
+            {
+                TotalTodayBookings = await _context.Bookings
+               .CountAsync(x => x.AppointmentDate == today),
+
+                TotalServices = await _context.Services.CountAsync(x => x.Status),
+
+                TotalCategories = await _context.Category.CountAsync(x => x.Status),
+
+                TotalVendors = await _context.Users.CountAsync(x => x.Role == UserRole.Vendor && x.IsActive),
+
+                TotalCustomers = await _context.Users.CountAsync(x => x.Role == UserRole.Customer && x.IsActive),
+
+                TotalSubAdmins = await _context.Users.CountAsync(x => x.Role == UserRole.SubAdmin && x.IsActive)
+            };
+
+            return dashboard;
+        }
     }
 }
