@@ -1,0 +1,97 @@
+﻿@attribute [Authorize]
+@page "/AppointmentView/{id:int}"
+@inject IVendorStaffService _vendorStaffService
+
+
+
+<div class="section-card">
+    <div class="row justify-content-between">
+        <div class="col-md-6 form-row">
+            <h3>BX-24X7 Salon</h3>
+        </div>
+       
+
+        <div class="col-md-4 form-row">
+            <div class="input-group-custom py-0 px-3">
+                <InputDate @bind-Value="@date" class="form-control border-0 bg-transparent" />
+            </div>
+        </div>
+    </div>
+   
+
+    <div class="row">
+          <div class="col-12">
+                <label class="form-label">
+                    <i class="fa-solid fa-user-shield"></i> Staff *
+                </label>
+
+            <select class="input-group-custom w-100 py-3 px-3"  @onchange="OnChangedStaff">
+                @foreach(var vendorStaff in vendorStaffs)
+                {
+                    <option value="@vendorStaff.Id">@vendorStaff.FullName</option>
+                }
+            </select>
+
+          </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-admin">
+            <thead><tr><th>Booking No.</th><th>Date</th> <th>Time</th><th>Customer Name</th><th>Customer Phone</th><th>Service</th><th>Price</th><th>Status</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>
+                       001
+                    </td>
+                    <td>
+                        25/5/2026
+                    </td>
+                    <td>
+                        9:00Am
+                    </td>
+
+                    <td>Jenna</td>
+                    <td>8968741458</td>
+                    <td>Hair cutting</td>
+                    <td>$50</td>
+                    <td>Pending</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-between mt-3"><span class="small">updated 2 min ago</span><span>1-5 of 23</span></div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    public DateOnly date = DateOnly.FromDateTime(DateTime.Today);
+
+    List<VendorStaffResponseDto> vendorStaffs = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetVendorStaffs();
+    }
+
+
+    private async Task GetVendorStaffs()
+    {
+        var response  = await _vendorStaffService.GetVendorStaffs(id);
+
+        if (response.Success)
+        {
+            vendorStaffs = response.Data ?? new List<VendorStaffResponseDto>();
+        }
+    }
+
+    private void OnChangedStaff ()
+    {
+        
+    }
+
+}

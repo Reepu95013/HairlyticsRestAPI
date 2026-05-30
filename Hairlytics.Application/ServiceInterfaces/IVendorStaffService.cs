@@ -14,6 +14,7 @@ namespace Hairlytics.Application.ServiceInterfaces
         Task<ServiceResponse<VendorStaffResponseDto>> GetVendorStafDetailsAsync(int staffId);
         Task<ServiceResponse<string>> AddVendorStafAvailabilityAsync(int staffId, List<StaffAvailabilityCreateDto> StaffAvailabilityCreateDtos);
         Task<ServiceResponse<List<TimeSlotDto>>> GetAvailableSlots(StaffAvailabilitySlotDto staffAvailabilitySlotDto);
+        Task<ServiceResponse<List<VendorStaffResponseDto>>> GetVendorStaffs(int vendorId);
 
     }
 }

@@ -2,6 +2,7 @@
 using Hairlytics.Application.DTOs.BookingDTOs;
 using Hairlytics.Application.DTOs.HelperDTOs;
 using Hairlytics.Application.DTOs.ServiceDTOs;
+using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.DTOs.VendorStaffDTOs;
 using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Hairlytics.Application.Services
 {
@@ -213,7 +215,26 @@ namespace Hairlytics.Application.Services
             return response;
         }
 
+        public async Task<ServiceResponse<List<VendorStaffResponseDto>>> GetVendorStaffs(int vendorId)
+        {
+            var response = new ServiceResponse<List<VendorStaffResponseDto>>();
+            var  staffs = await _vendorStaffRepository.GetVendorStaffsAsync(vendorId);
+            var data = _mapper.Map<List<VendorStaffResponseDto>>(staffs);
 
+            if (data.Count==0)
+            {
+                response.Success = false;
+                response.Data = [];
+                response.Message = "Data not found";
+            }else
+            {
+                response.Success = true;
+                response.Data = data;
+                response.Message = "Success!";
+            }
+
+            return response;
+        }
 
         public async Task<ServiceResponse<VendorStaffResponseDto>> GetVendorStafDetailsAsync(int staffId)
         {

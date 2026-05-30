@@ -137,6 +137,9 @@ namespace Hairlytics.Infrastructure.Repositories
             return bookings;
         }
 
-       
+        public async Task<int> GetBookingCountAsync(DateOnly appointmentDate, BookingStatus bookingStatus)
+        {
+            return await _context.Bookings.CountAsync(x =>x.AppointmentDate == appointmentDate && x.Status == bookingStatus);
+        }
     }
 }

@@ -59,5 +59,13 @@ namespace Hairlytics.Infrastructure.Repositories
 
             return staff;
         }
+
+        public async Task<List<VendorStaff>> GetVendorStaffsAsync(int vendorId)
+        {
+            return await _context.VendorStaff
+            .Include(s => s.StaffAvailabilities)
+            .Where(s => s.IsActive)
+            .ToListAsync();
+        }
     }
 }

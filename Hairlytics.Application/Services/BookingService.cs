@@ -377,6 +377,25 @@ namespace Hairlytics.Application.Services
 
         }
 
+        public async Task<ServiceResponse<int>> GetBookingCount(DateOnly appointmentDate, BookingStatus bookingStatus)
+        {
+            var response = new ServiceResponse<int>();
+            var data  = await  _bookingRepository.GetBookingCountAsync(appointmentDate, bookingStatus);
+            if(data != 0)
+            {
+                response.Data = data;
+                response.Success = true;
+                response.Message = "Success!";
 
+                return response;
+
+            }else
+            {
+                response.Data = data;
+                response.Success = false;
+                response.Message = "Failed!";
+                return response;
+            }
+        }
     }
 }

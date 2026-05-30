@@ -14,5 +14,6 @@ namespace Hairlytics.Domain.Interfaces
         Task<List<StaffAvailability>> GetStaffAvailability(int staffId);
         Task AddAvailabilityAsync(StaffAvailability availability);
         Task SaveChangesAsync();
+        Task<List<VendorStaff>> GetVendorStaffsAsync(int vendorId);
     }
 }

@@ -1,43 +1,43 @@
 ﻿@attribute [Authorize]
 @page "/Appointments"
+@inject NavigationManager navigationManager
+@inject IUserService _userService
+@inject IHelperService _helperService
+@inject IServiceService _serviceService
+@inject IBookingService _bookingService
+@inject LoadingService LoadingService
+@rendermode InteractiveServer
+
 
 <div class="row g-4 mb-4">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="stat-card d-flex align-items-center">
             <div class="stat-icon me-3"><i class="fas fa-cut"></i></div>
             <div>
                 <span class="text-secondary-emphasis small text-uppercase">Today's bookings</span>
-                <h3 class="fw-bold mb-0">24</h3>
+                <h3 class="fw-bold mb-0">@todayBooking</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="stat-card d-flex align-items-center">
             <div class="stat-icon me-3"><i class="fas fa-hourglass-half"></i></div>
             <div>
                 <span class="text-secondary-emphasis small">PENDING</span>
-                <h3 class="fw-bold mb-0">12</h3>
+                <h3 class="fw-bold mb-0">@todayPendingBooking</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="stat-card d-flex align-items-center">
             <div class="stat-icon me-3"><i class="fas fa-check-circle"></i></div>
             <div>
-                <span class="text-secondary-emphasis small">CONFIRMED</span>
-                <h3 class="fw-bold mb-0">18</h3>
+                <span class="text-secondary-emphasis small">COMPLETED</span>
+                <h3 class="fw-bold mb-0">@todayCompleteBooking</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="stat-card d-flex align-items-center">
-            <div class="stat-icon me-3"><i class="fas fa-dollar-sign"></i></div>
-            <div>
-                <span class="text-secondary-emphasis small">REVENUE </span>
-                <h3 class="fw-bold mb-0">$1,280</h3>
-            </div>
-        </div>
-    </div>
+    
 </div>
 
 
@@ -49,49 +49,133 @@
     </div>
     <div class="table-responsive">
         <table class="table table-admin">
-            <thead><tr><th>Time</th><th>Client</th><th>Employee</th><th>Service</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+            <thead><tr><th>Vendor</th><th>Salon</th><th>Description</th><th>Phone</th><th>Action</th></tr></thead>
             <tbody>
-                <tr>
-                    <td>09:30</td>
-                    <td><div class="d-flex align-items-center gap-2"><span class="avatar-sm">ML</span>Maya Lopez</div></td>
-                    <td>Jenna</td><td><span class="feature-tag">haircut</span></td>
-                    <td><span class="status-badge status-confirmed">confirmed</span></td>
-                    <td></td>
-                    <td><i class="fas fa-edit"></i></td>
-                </tr>
-                <tr>
-                    <td>09:30</td>
-                    <td><div class="d-flex align-items-center gap-2"><span class="avatar-sm">ML</span>Maya Lopez</div></td>
-                    <td>Jenna</td>
-                    <td><span class="feature-tag">haircut</span></td>
-                    <td><span class="status-badge status-confirmed">confirmed</span></td>
-                    <td></td>
-                    <td><i class="fas fa-edit"></i></td>
-                </tr>
-                <tr>
-                    <td>09:30</td>
-                    <td><div class="d-flex align-items-center gap-2"><span class="avatar-sm">ML</span>Maya Lopez</div></td>
-                    <td>Jenna</td>
-                    <td><span class="feature-tag">haircut</span></td>
-                    <td><span class="status-badge status-confirmed">confirmed</span></td>
-                    <td></td>
-                    <td><i class="fas fa-edit"></i></td>
-                </tr>
-                <tr>
-                    <td>09:30</td>
-                    <td><div class="d-flex align-items-center gap-2"><span class="avatar-sm">ML</span>Maya Lopez</div></td>
-                    <td>Jenna</td>
-                    <td><span class="feature-tag">haircut</span></td>
-                    <td><span class="status-badge status-confirmed">confirmed</span></td>
-                    <td></td>
-                    <td><i class="fas fa-edit"></i></td>
-                </tr>
+                 @foreach (var vendor in vendors)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="avatar-sm">@vendor.Name[0]@vendor.LastName?[0]</span>
+                                <div>@vendor.Name <br><small class="text-secondary">@vendor.Email</small></div>
+                            </div>
+                        </td>
+
+                        <td>@vendor.VendorProfileResponseDto?.ShopName</td>
+                        <td>@vendor.VendorProfileResponseDto?.Description</td>
+                        <td>@vendor.VendorProfileResponseDto?.ShopTelephone</td>
+                        <td>
+                            @if (vendor?.VendorProfileResponseDto?.Id != null)
+                            {
+                                <i class="fas fa-eye"
+                                   @onclick="() => GoToAppointmentView(vendor.VendorProfileResponseDto.Id)">
+                                </i>
+                            }
+                        </td>
+                    </tr>
+                }
+
                 </tbody>
         </table>
     </div>
-    <div class="d-flex justify-content-between mt-3"><span class="small">updated 2 min ago</span><span>1-5 of 23</span></div>
+    <div class="d-flex justify-content-between mt-3">
+        <span class="small">updated 2 min ago</span>
+        <span class="d-flex gap-2">
+            @if (pageNo > 1)
+            {
+                <span class="avatar-sm d-flex align-items-center justify-content-center bg-light" @onclick="ClickOnPrevButton">
+                    <i class="fas fa-chevron-left"></i>
+                </span>
+            }
+           
+            @if (hasMoreData == true)
+            {
+                <span class="avatar-sm d-flex align-items-center justify-content-center bg-light" @onclick="ClickOnNextButton">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+                
+            }
+           
+         </span>
+     </div>
 </div>
 
 @code {
+
+    List<UserResponseDto> vendors = new();
+    private int pageNo { get; set; } = 1;
+    private int pageSize { get; set; } = 10;
+    private int todayBooking { get; set; } = 0;
+    private int todayPendingBooking { get; set; } = 0;
+    private int todayCompleteBooking { get; set; } = 0;
+    private bool hasMoreData = true;
+
+    async Task LoadVendors(string? indicator)
+    {
+        if (indicator == "next")
+        {
+            var data = await _userService.GetUsersAsync(UserRole.Vendor, pageNo+1, pageSize+10 );
+            if (data.Count != 0)
+            {
+                vendors = data;
+                pageNo = pageNo + 1;
+                pageSize = pageSize + 10;
+            }
+            else
+            {
+                hasMoreData = false;
+            }
+        }else if(indicator == "prev")
+        {
+            var data = await _userService.GetUsersAsync(UserRole.Vendor, pageNo - 1, pageSize - 10);
+            vendors = data;
+            pageNo = pageNo - 1;
+            pageSize = pageSize - 10;
+            hasMoreData = true;
+              
+        }
+        else
+        {
+            var data = await _userService.GetUsersAsync(UserRole.Vendor, pageNo, pageSize);
+            vendors = data;
+            hasMoreData = true;
+        }        
+    }
+
+    private async Task GetTodayBookingCount()
+    {
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        var pendingData = await _bookingService.GetBookingCount(today, BookingStatus.Pending);
+        todayPendingBooking = pendingData.Data;
+
+        var completeData = await _bookingService.GetBookingCount(today, BookingStatus.Pending);
+        todayCompleteBooking = completeData.Data;
+
+        todayBooking = todayPendingBooking + todayCompleteBooking;
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTodayBookingCount();
+        await LoadVendors(null);
+    }
+
+    private async Task ClickOnNextButton (){
+       await LoadVendors("next");
+    }
+
+    private async Task ClickOnPrevButton()
+    {       
+        await LoadVendors("prev");
+    }
+
+
+    private void GoToAppointmentView(int id)
+    {
+        navigationManager.NavigateTo($"/AppointmentView/{id}", true);
+    }
+
+    
 
 }

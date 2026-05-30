@@ -1,9 +1,11 @@
 ﻿using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Hairlytics.Domain.Interfaces
 {
@@ -19,9 +21,7 @@ namespace Hairlytics.Domain.Interfaces
         Task<List<Booking>> GetAllBookingByVendorAsync(int pageNumber, int pageSize, int vendorId);
         Task<List<Booking>> GetAllBookingByStaffAsync(int pageNumber, int pageSize, int staffId);
         Task<List<Booking>> GetAllBookingByUserAsync(int pageNumber, int pageSize, int userId);
-        
-
-
+        Task<int>GetBookingCountAsync(DateOnly appointmentDate, BookingStatus bookingStatus);
 
     }
 }
