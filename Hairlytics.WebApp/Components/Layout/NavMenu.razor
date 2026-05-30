@@ -14,22 +14,28 @@
         <NavLink href="/Appointments" class="nav-link w-100 text-start">
             <i class="fas fa-calendar-check"></i> Appointments
         </NavLink>
+        <NavLink href="/Users" class="nav-link w-100 text-start">
+            <i class="fas fa-user-friends"></i> Users
+        </NavLink>
+        <NavLink href="/Vendors" class="nav-link w-100 text-start">
+            <i class="fa-solid fa-shop"></i> Vendors
+        </NavLink>
         <NavLink href="/Employee" class="nav-link w-100 text-start">
             <i class="fas fa-user-tie"></i> Employees
         </NavLink>
-        <button class="nav-link w-100 text-start">
-            <i class="fas fa-star"></i> Features / Services
-        </button>
-        <button class="nav-link w-100 text-start">
+        <NavLink href="/Categories" class="nav-link w-100 text-start">
+            <i class="fas fa-shapes"></i> Categories
+        </NavLink>
+        <NavLink href="/AccessControl" class="nav-link w-100 text-start">
             <i class="fas fa-shield-alt"></i> Access control
-        </button>
-        <button class="nav-link w-100 text-start">
+        </NavLink>
+        <NavLink href="/Analytics" class="nav-link w-100 text-start">
             <i class="fas fa-chart-line"></i> Analytics
-        </button>
+        </NavLink>
         <hr class="bg-secondary opacity-25 mx-3">
-        <button class="nav-link w-100 text-start">
+        <NavLink href="/Settings" class="nav-link w-100 text-start">
             <i class="fas fa-cog"></i> Settings
-        </button>
+        </NavLink>
         
         <NavLink href="/PostLogout" class="nav-link w-100 text-start">
             <i class="fas fa-sign-out-alt"></i> Logout
@@ -37,20 +43,4 @@
     </div>
 </nav>
 
-@code {
-
-
-    void HandleLogout()
-    {
-        string name = "mljl";
-        Console.WriteLine(name);
-    }
-
-    
-
-    
-
-
-   
-
-}
+@code { }

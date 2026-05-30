@@ -1,0 +1,153 @@
+@attribute [Authorize]
+@page "/Settings"
+@inject IAuthService _authService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject AppSettingsFileService AppSettingsService
+@inject LoadingService LoadingService
+@rendermode InteractiveServer
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<div class="page-header mb-2">
+    <div class="header-title d-flex align-items-center">
+        <h2><i class="fas fa-cog me-3" style="color:#d4a373;"></i> Settings</h2>
+        <span class="badge-salon ms-3"><i class="fas fa-sliders-h me-1"></i> admin preferences</span>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="section-card">
+            <h4 class="section-title"><i class="fas fa-lock me-2" style="color:#d4a373;"></i> Change password</h4>
+            <EditForm Model="@passwordModel" OnValidSubmit="ChangePassword">
+                <div class="form-row">
+                    <label class="form-label">Username</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="text" @bind="passwordModel.Username" disabled />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">New password *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="password" @bind="passwordModel.Password" placeholder="Min. 8 characters" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Confirm password *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="password" @bind="passwordModel.ConfirmPassword" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn-outline-admin py-lg-2 mt-2">
+                    <i class="fas fa-save me-2"></i> Update password
+                </button>
+            </EditForm>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="section-card">
+            <h4 class="section-title"><i class="fas fa-server me-2" style="color:#d4a373;"></i> Application configuration</h4>
+            <p class="text-secondary small">Changes are written to <code>appsettings.json</code>. Restart the app after saving database or storage paths.</p>
+            <EditForm Model="@appSettings" OnValidSubmit="SaveAppSettings">
+                <div class="form-row">
+                    <label class="form-label">Database connection string *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <textarea rows="2" @bind="appSettings.DefaultConnection" required></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">File storage path *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="text" @bind="appSettings.FileStorageBasePath" required />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 form-row">
+                        <label class="form-label">SMTP server *</label>
+                        <div class="input-group-custom py-0 px-3">
+                            <input type="text" @bind="appSettings.SmtpServer" required />
+                        </div>
+                    </div>
+                    <div class="col-md-4 form-row">
+                        <label class="form-label">SMTP port *</label>
+                        <div class="input-group-custom py-0 px-3">
+                            <input type="number" @bind="appSettings.SmtpPort" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Email from *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="email" @bind="appSettings.EmailFrom" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Email username *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="text" @bind="appSettings.EmailUsername" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Email password</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="password" @bind="appSettings.EmailPassword" placeholder="Leave blank to keep current password" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Session timeout (minutes) *</label>
+                    <div class="input-group-custom py-0 px-3">
+                        <input type="number" min="5" max="480" @bind="appSettings.SessionTimeoutMinutes" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn-outline-admin py-lg-2 mt-2">
+                    <i class="fas fa-save me-2"></i> Save configuration
+                </button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    ChangePasswordDto passwordModel = new() { Username = "", Password = "", ConfirmPassword = "" };
+    AppSettingsDto appSettings = new();
+    private List<ToastMessage> messages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        passwordModel.Username = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "";
+        appSettings = AppSettingsService.Load();
+    }
+
+    async Task ChangePassword() =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var response = await _authService.ChangePasswordAsync(passwordModel);
+            messages.Add(new ToastMessage
+            {
+                Type = response.Success ? ToastType.Success : ToastType.Danger,
+                Title = response.Success ? "Success" : "Error",
+                Message = response.Message
+            });
+            if (response.Success)
+            {
+                passwordModel.Password = "";
+                passwordModel.ConfirmPassword = "";
+            }
+        });
+
+    async Task SaveAppSettings() =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var (success, message) = await AppSettingsService.SaveAsync(appSettings);
+            messages.Add(new ToastMessage
+            {
+                Type = success ? ToastType.Success : ToastType.Danger,
+                Title = success ? "Saved" : "Error",
+                Message = message
+            });
+            if (success)
+                appSettings.EmailPassword = "";
+        });
+}

@@ -1,97 +1,131 @@
 ﻿@attribute [Authorize]
 @page "/AppointmentView/{id:int}"
 @inject IVendorStaffService _vendorStaffService
-
-
+@inject IBookingService _bookingService
+@inject IUserService _userService
+@inject LoadingService LoadingService
+@rendermode InteractiveServer
 
 <div class="section-card">
     <div class="row justify-content-between">
         <div class="col-md-6 form-row">
-            <h3>BX-24X7 Salon</h3>
+            <h3>@(shopName ?? "Salon bookings")</h3>
         </div>
-       
-
         <div class="col-md-4 form-row">
             <div class="input-group-custom py-0 px-3">
-                <InputDate @bind-Value="@date" class="form-control border-0 bg-transparent" />
+                <InputDate @bind-Value="@date" class="form-control border-0 bg-transparent" @bind-Value:after="LoadBookings" />
             </div>
         </div>
     </div>
-   
 
     <div class="row">
-          <div class="col-12">
-                <label class="form-label">
-                    <i class="fa-solid fa-user-shield"></i> Staff *
-                </label>
-
-            <select class="input-group-custom w-100 py-3 px-3"  @onchange="OnChangedStaff">
-                @foreach(var vendorStaff in vendorStaffs)
+        <div class="col-12">
+            <label class="form-label">
+                <i class="fa-solid fa-user-shield"></i> Staff filter
+            </label>
+            <select class="input-group-custom w-100 py-3 px-3" @onchange="OnChangedStaff">
+                <option value="0">All staff</option>
+                @foreach (var vendorStaff in vendorStaffs)
                 {
-                    <option value="@vendorStaff.Id">@vendorStaff.FullName</option>
+                    <option value="@vendorStaff.Id" selected="@(selectedStaffId == vendorStaff.Id)">@vendorStaff.FullName</option>
                 }
             </select>
-
-          </div>
+        </div>
     </div>
-    
-    <div class="table-responsive">
+
+    <div class="table-responsive mt-3">
         <table class="table table-admin">
-            <thead><tr><th>Booking No.</th><th>Date</th> <th>Time</th><th>Customer Name</th><th>Customer Phone</th><th>Service</th><th>Price</th><th>Status</th></tr></thead>
+            <thead><tr><th>Booking No.</th><th>Date</th><th>Time</th><th>Customer</th><th>Phone</th><th>Service</th><th>Price</th><th>Status</th></tr></thead>
             <tbody>
-                <tr>
-                    <td>
-                       001
-                    </td>
-                    <td>
-                        25/5/2026
-                    </td>
-                    <td>
-                        9:00Am
-                    </td>
-
-                    <td>Jenna</td>
-                    <td>8968741458</td>
-                    <td>Hair cutting</td>
-                    <td>$50</td>
-                    <td>Pending</td>
-                </tr>
-
+                @if (bookings.Count == 0)
+                {
+                    <tr><td colspan="8" class="text-center text-secondary py-4">No bookings for selected filters.</td></tr>
+                }
+                @foreach (var booking in bookings)
+                {
+                    <tr>
+                        <td>@booking.Id.ToString("D3")</td>
+                        <td>@booking.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                        <td>@FormatTime(booking.StartTime)</td>
+                        <td>@booking.CustomerName</td>
+                        <td>@booking.CustomerPhone</td>
+                        <td>@GetServiceNames(booking)</td>
+                        <td>$ @booking.TotalAmount</td>
+                        <td>@booking.Status</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
-    <div class="d-flex justify-content-between mt-3"><span class="small">updated 2 min ago</span><span>1-5 of 23</span></div>
 </div>
-
-
 
 @code {
     [Parameter]
     public int id { get; set; }
+
     public DateOnly date = DateOnly.FromDateTime(DateTime.Today);
-
+    string? shopName;
+    int selectedStaffId;
     List<VendorStaffResponseDto> vendorStaffs = new();
+    List<BookingResponseDto> bookings = new();
 
+    protected override async Task OnInitializedAsync() =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            await GetVendorStaffs();
+            await ResolveShopName();
+            await LoadBookingsInternal();
+        });
 
-    protected override async Task OnInitializedAsync()
+    async Task LoadBookings() =>
+        await LoadingService.ExecuteAsync(LoadBookingsInternal);
+
+    async Task ResolveShopName()
     {
-        await GetVendorStaffs();
+        var vendors = await _userService.GetUsersAsync(UserRole.Vendor, 1, 200);
+        shopName = vendors.FirstOrDefault(v => v.VendorProfileResponseDto?.Id == id)?.VendorProfileResponseDto?.ShopName;
     }
 
-
-    private async Task GetVendorStaffs()
+    async Task GetVendorStaffs()
     {
-        var response  = await _vendorStaffService.GetVendorStaffs(id);
-
+        var response = await _vendorStaffService.GetVendorStaffs(id);
         if (response.Success)
-        {
             vendorStaffs = response.Data ?? new List<VendorStaffResponseDto>();
+    }
+
+    async Task OnChangedStaff(ChangeEventArgs e)
+    {
+        selectedStaffId = int.TryParse(e.Value?.ToString(), out var staffId) ? staffId : 0;
+        await LoadBookings();
+    }
+
+    async Task LoadBookingsInternal()
+    {
+        var pagination = new PaginationDto { PageNumber = 1, PageSize = 100 };
+        ServiceResponse<List<BookingResponseDto>> response;
+        if (selectedStaffId > 0)
+            response = await _bookingService.GetBookingListByStaff(pagination, selectedStaffId);
+        else
+            response = await _bookingService.GetBookingListByVendor(pagination, id);
+
+        if (response.Success && response.Data != null)
+        {
+            bookings = response.Data
+                .Where(b => b.AppointmentDate == date)
+                .OrderBy(b => b.StartTime)
+                .ToList();
+        }
+        else
+        {
+            bookings = new();
         }
     }
 
-    private void OnChangedStaff ()
-    {
-        
-    }
+    static string FormatTime(TimeSpan time) =>
+        DateTime.Today.Add(time).ToString("hh:mm tt");
 
+    static string GetServiceNames(BookingResponseDto booking) =>
+        string.Join(", ", booking.BookedService
+            .Select(bs => bs.Service?.ServiceName)
+            .Where(n => !string.IsNullOrWhiteSpace(n)));
 }

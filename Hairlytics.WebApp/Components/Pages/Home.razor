@@ -6,13 +6,12 @@
 
 @inject IUserService _userService
 @inject IHelperService _helperService
-@inject IServiceService _serviceService
+@inject ICategoryServices _categoryService
 @inject LoadingService LoadingService
 
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
-<LoaderComponent />
 <!-- quick stats cards (handle, overview) -->
 <div class="row g-4 mb-4">
     <div class="col-md-4">
@@ -29,7 +28,7 @@
         <div class="stat-card d-flex align-items-center">
             <div class="stat-icon me-3"><i class="fas fa-spa"></i></div>
             <div>
-                <span class="text-secondary-emphasis small">SERVICES</span>
+                <span class="text-secondary-emphasis small">SERVICES (ACTIVE)</span>
                 <h3 class="fw-bold mb-0">@dashboardDto.TotalServices</h3>
             </div>
         </div>
@@ -78,14 +77,6 @@
 </div>
 
 
-<div class="flex-column mb-4 g-lg-5">
-    <Button Color="ButtonColor.Primary"> Primary </Button>
-    <Button Color="ButtonColor.Secondary"> Secondary </Button>
-    <Button Color="ButtonColor.Success"> Success </Button>
-</div>
-
-
-
 <!-- ========= EMPLOYEE SECTION ========= -->
 <div class="section-card" id="employeeSection">
     <div class="d-flex align-items-center justify-content-between">
@@ -128,7 +119,7 @@
         </table>
     </div>
     <div class="text-end mt-2">
-        <a href="#" class="text-decoration-none small">view all employees <i class="fas fa-arrow-right ms-1"></i></a>
+        <a href="/Employee" class="text-decoration-none small">view all employees <i class="fas fa-arrow-right ms-1"></i></a>
     </div>
 </div>
 
@@ -179,7 +170,7 @@
         </table>
     </div>
     <div class="text-end mt-2">
-        <a href="#" class="text-decoration-none small">view all employees <i class="fas fa-arrow-right ms-1"></i></a>
+        <a href="/Vendors" class="text-decoration-none small">view all vendors <i class="fas fa-arrow-right ms-1"></i></a>
     </div>
 </div>
 
@@ -228,7 +219,7 @@
         </table>
     </div>
     <div class="text-end mt-2">
-        <a href="#" class="text-decoration-none small">view all employees <i class="fas fa-arrow-right ms-1"></i></a>
+        <a href="/Users" class="text-decoration-none small">view all users <i class="fas fa-arrow-right ms-1"></i></a>
     </div>
 </div>
 
@@ -240,36 +231,31 @@
     <div class="col-lg-12">
         <div class="section-card h-100">
             <div class="d-flex align-items-center justify-content-between">
-                <h4 class="section-title mb-0"><i class="fas fa-star me-2" style="color:#d4a373;"></i> Salon Service</h4>
-                <button class="btn btn-outline-admin"><i class="fas fa-plus"></i> Service</button>
+                <h4 class="section-title mb-0"><i class="fas fa-shapes me-2" style="color:#d4a373;"></i> Categories</h4>
+                <button class="btn btn-outline-admin" @onclick="GoToCategories"><i class="fas fa-plus"></i> Manage categories</button>
             </div>
             <div class="mt-3">
                 <table class="table table-admin">
                     <thead>
-                        <tr><th>Service name</th><th>Category</th><th>Pricing</th> <th>Discount</th><th>Duration</th><th>Active</th><th>Action</th></tr>
+                        <tr><th>Category</th><th>Description</th><th>Parent</th><th>Action</th></tr>
                     </thead>
                     <tbody>
-                        @foreach(var service in services){
+                        @foreach (var cat in categories.Take(10))
+                        {
                         <tr>
-                            <td class="text-capitalize">@service.ServiceName</td>
-                            <td>@service.CategoryResponseDto?.CategoryName</td>
-                            <td>$ @service.Price</td>
-                                <td>
-                                    <i class="fas fa-tag text-secondary"></i> @(service.OffPrice ?? 0)
+                            <td class="text-capitalize">@cat.CategoryName</td>
+                            <td class="small text-secondary">@(cat.Description?.Length > 50 ? cat.Description[..50] + "…" : cat.Description)</td>
+                            <td>@(cat.ParentCategoryId == null ? "—" : "Subcategory")</td>
+                            <td>
+                                <i class="fas fa-edit text-secondary me-3" style="cursor:pointer" @onclick="GoToCategories"></i>
                             </td>
-                            <td><i class="fas fa-clock text-secondary"></i> @service.Duration Minutes</td>
-                             <td>@(service.Status ? "Active" : "Inactive")</td>
-                                <td>
-                                    <i class="fas fa-edit text-secondary me-3"></i>
-                                    <i class="fas fa-trash-alt text-danger-light"></i>
-                                </td>
                         </tr>
                         }
                     </tbody>
                 </table>
             </div>
             <div class="mt-2">
-                <span class="feature-tag"><i class="far fa-clock me-1"></i> 18 active features</span>
+                <span class="feature-tag"><i class="far fa-clock me-1"></i> @categories.Count category(ies) listed</span>
             </div>
         </div>
     </div>
@@ -283,7 +269,7 @@
     <div class="col-12">
         <div class="section-card d-flex align-items-center justify-content-between p-3">
             <div><i class="fas fa-hand-paper me-2 fs-4" style="color:#d4a373;"></i> <strong>Handle incoming requests:</strong> 2 new appointment requests pending</div>
-            <button class="btn btn-dark px-5 py-2 rounded-pill" style="background:#1e2a3a;">Review bookings</button>
+            <button class="btn btn-dark px-5 py-2 rounded-pill" style="background:#1e2a3a;" @onclick="GoToAppointments">Review bookings</button>
         </div>
     </div>
 </div>
@@ -294,7 +280,7 @@
     List<UserResponseDto> users = new();
     List<UserResponseDto> vendors = new();
     List<UserResponseDto> employee = new();
-    List<ServiceResponseDto> services = new(); 
+    List<CategoryResponseDto> categories = new(); 
 
     private List<ToastMessage> messages = new();
 
@@ -308,22 +294,19 @@
         vendors = await _userService.GetUsersAsync(UserRole.Vendor, 1, 10);
         employee = await _userService.GetUsersAsync(UserRole.SubAdmin, 1, 10);
 
-        var response =   await _serviceService.GetServiceListAsync();
-        if (response.Success && response.Data!=null)
+        var catResponse = await _categoryService.GetCategoryListAsync();
+        if (catResponse.Success && catResponse.Data != null)
         {
-            services = response.Data;
+            categories = catResponse.Data;
         }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadUsers();
-    }
+    protected override async Task OnInitializedAsync() =>
+        await LoadingService.ExecuteAsync(LoadUsers);
 
-    private void GoToAddUser()
-    {
-        navigationManager.NavigateTo("/Add-User", true);
-    }
+    private void GoToAddUser() => navigationManager.NavigateTo("/Add-User", true);
+    private void GoToCategories() => navigationManager.NavigateTo("/Categories", true);
+    private void GoToAppointments() => navigationManager.NavigateTo("/Appointments", true);
 
 
     private void UpdateUser(int id)
@@ -332,60 +315,18 @@
 
     }
 
-    private async Task DeleteUser(int id) {
-        LoadingService.IsLoading = true;
-        var response  =   await _userService.DeleteUserAsync(id);
-
-        if (response.Success)
+    private async Task DeleteUser(int id) =>
+        await LoadingService.ExecuteAsync(async () =>
         {
-
+            var response = await _userService.DeleteUserAsync(id);
             messages.Add(new ToastMessage
             {
-                Type = ToastType.Success,
-                Title = "Success!",
+                Type = response.Success ? ToastType.Success : ToastType.Danger,
+                Title = response.Success ? "Success!" : "Error!",
                 Message = response.Data
             });
-
-            await LoadUsers();
-            LoadingService.IsLoading = false;
-
-        }
-        else
-        {
-            messages.Add(new ToastMessage
-            {
-                Type = ToastType.Danger,
-                Title = "Error!",
-                Message = response.Data
-            });
-            LoadingService.IsLoading = false;
-        }
-    }
-
-    private async Task DeleteUser1(int id)
-    {
-        LoadingService.IsLoading = true;
-
-        await Task.Yield(); // important
-
-        try
-        {
-            await Task.Delay(3000);
-            // await _userService.DeleteUser(id);
-        }
-        finally
-        {
-            LoadingService.IsLoading = false;
-        }
-
-
-    }
-
-
-
-   
-
-    
+            if (response.Success) await LoadUsers();
+        });
 
 
 

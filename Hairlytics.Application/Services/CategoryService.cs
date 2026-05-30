@@ -1,15 +1,9 @@
 ﻿using AutoMapper;
 using Hairlytics.Application.DTOs.CategoryDTOs;
 using Hairlytics.Application.DTOs.HelperDTOs;
-using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.ServiceInterfaces;
-using Hairlytics.Domain.Entities;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hairlytics.Application.Services
 {
@@ -18,7 +12,6 @@ namespace Hairlytics.Application.Services
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
-
 
         public CategoryService(ICategoryRepository categoryRepository, IMapper mapper, IFileService fileService)
         {
@@ -32,19 +25,62 @@ namespace Hairlytics.Application.Services
             var response = new ServiceResponse<string>();
             try
             {
-                var category = _mapper.Map<Category>(categoryCreateDto);
+                var imagePath = await _fileService.SaveImage(categoryCreateDto.file, FolderNames.Category);
+                categoryCreateDto.Image = imagePath;
+                var category = _mapper.Map<Domain.Entities.Category>(categoryCreateDto);
                 await _categoryRepository.AddCategory(category);
                 response.Success = true;
-                response.Message = "Category has been created successfuly!";
-
+                response.Message = "Category has been created successfully!";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = ex.Message;
             }
-               
-            return response;                       
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<string>> UpdateCategoryAsync(CategoryUpdateDto categoryUpdateDto)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+                var existing = await _categoryRepository.GetCategory(categoryUpdateDto.Id);
+                if (existing == null)
+                {
+                    response.Success = false;
+                    response.Message = "Category not found.";
+                    return response;
+                }
+
+                if (categoryUpdateDto.file != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(existing.Image))
+                    {
+                        _fileService.DeleteFile(existing.Image);
+                    }
+                    categoryUpdateDto.Image = await _fileService.SaveImage(categoryUpdateDto.file, FolderNames.Category);
+                }
+
+                _mapper.Map(categoryUpdateDto, existing);
+
+                if (!string.IsNullOrWhiteSpace(categoryUpdateDto.Image))
+                {
+                    existing.Image = categoryUpdateDto.Image;
+                }
+
+                await _categoryRepository.UpdateCategory(existing);
+                response.Success = true;
+                response.Message = "Category updated successfully!";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
 
         public async Task<ServiceResponse<string>> DeleteCategoryAsync(int categoryId)
@@ -53,14 +89,13 @@ namespace Hairlytics.Application.Services
             try
             {
                 await _categoryRepository.DeleteCategory(categoryId);
-
                 response.Success = true;
                 response.Message = "Category has been deleted successfully!";
             }
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = ex.Message; // or custom message
+                response.Message = ex.Message;
             }
             return response;
         }
@@ -68,11 +103,16 @@ namespace Hairlytics.Application.Services
         public async Task<ServiceResponse<CategoryResponseDto>> GetCategoryAsync(int categoryId)
         {
             var response = new ServiceResponse<CategoryResponseDto>();
-
             var data = await _categoryRepository.GetCategory(categoryId);
 
-           var category = _mapper.Map<CategoryResponseDto>(data);
+            if (data == null)
+            {
+                response.Success = false;
+                response.Message = "Category not found";
+                return response;
+            }
 
+            var category = _mapper.Map<CategoryResponseDto>(data);
             category.Image = _fileService.GetCategoryImage(category.Image);
 
             foreach (var item in category.SubCategories)
@@ -80,30 +120,16 @@ namespace Hairlytics.Application.Services
                 item.Image = _fileService.GetCategoryImage(item.Image);
             }
 
-            if (category == null)
-            {
-                response.Success = false;
-                response.Message = "Data not found";
-                response.Data = null;
-            }
-            else
-            {
-                response.Success = true;
-                response.Message = "Data not found";
-                response.Data = category;
-            }
-
-
+            response.Success = true;
+            response.Message = "Success";
+            response.Data = category;
             return response;
-
         }
 
         public async Task<ServiceResponse<List<CategoryResponseDto>>> GetCategoryListAsync()
         {
             var response = new ServiceResponse<List<CategoryResponseDto>>();
-
             var data = await _categoryRepository.GetCategoryList();
-
             var categories = _mapper.Map<List<CategoryResponseDto>>(data);
 
             foreach (var item in categories)
@@ -113,10 +139,32 @@ namespace Hairlytics.Application.Services
 
             response.Success = true;
             response.Message = "Success";
-            response.Data= categories;
-
+            response.Data = categories;
             return response;
+        }
 
+        public async Task<ServiceResponse<PagedResultDto<CategoryResponseDto>>> GetCategoryListPagedAsync(int pageNumber, int pageSize)
+        {
+            var response = new ServiceResponse<PagedResultDto<CategoryResponseDto>>();
+            var total = await _categoryRepository.GetCategoryCountAsync();
+            var data = await _categoryRepository.GetCategoryList(pageNumber, pageSize);
+            var categories = _mapper.Map<List<CategoryResponseDto>>(data);
+
+            foreach (var item in categories)
+            {
+                item.Image = _fileService.GetCategoryImage(item.Image);
+            }
+
+            response.Success = true;
+            response.Message = "Success";
+            response.Data = new PagedResultDto<CategoryResponseDto>
+            {
+                Items = categories,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = total
+            };
+            return response;
         }
     }
 }

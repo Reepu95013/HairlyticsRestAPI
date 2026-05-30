@@ -1,0 +1,9 @@
+@inject LoadingService LoadingService
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            LoadingService.Hide();
+    }
+}

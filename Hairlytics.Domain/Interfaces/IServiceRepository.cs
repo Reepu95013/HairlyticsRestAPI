@@ -10,8 +10,11 @@ namespace Hairlytics.Domain.Interfaces
     public interface IServiceRepository
     {
         Task AddService(Service service);
+        Task<Service?> GetServiceByIdAsync(int serviceId);
+        Task UpdateServiceAsync(Service service);
         Task<List<Service>> GetServiceList(int vendorProfileId);
         Task<List<Service>> GetServiceList();
+        Task<List<Service>> GetAllServicesAsync();
         Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds);
 
     }

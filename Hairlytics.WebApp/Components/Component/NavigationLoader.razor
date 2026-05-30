@@ -1,0 +1,20 @@
+@inject NavigationManager Navigation
+@inject LoadingService LoadingService
+@implements IDisposable
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        LoadingService.Show();
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}

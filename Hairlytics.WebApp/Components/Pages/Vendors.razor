@@ -1,0 +1,118 @@
+@attribute [Authorize]
+@page "/Vendors"
+@inject IUserService _userService
+@inject NavigationManager navigationManager
+@inject LoadingService LoadingService
+@rendermode InteractiveServer
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<div class="section-card">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="section-title mb-0"><i class="fa-solid fa-shop me-2" style="color:#d4a373;"></i> Vendors</h4>
+        <button class="btn-outline-admin py-lg-2" @onclick="GoToAddVendor">
+            <i class="fas fa-plus me-1"></i> Add vendor
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-admin align-middle">
+            <thead>
+                <tr><th>Vendor</th><th>Salon</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                @if (pagedResult.Items.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-secondary py-4">No vendors found.</td></tr>
+                }
+                @foreach (var vendor in pagedResult.Items)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="avatar-sm">@(vendor.Name.Length > 0 ? vendor.Name[0] : '?')</span>
+                                <div>@vendor.Name @vendor.LastName<br><small class="text-secondary">@vendor.Email</small></div>
+                            </div>
+                        </td>
+                        <td>@vendor.VendorProfileResponseDto?.ShopName</td>
+                        <td>@vendor.VendorProfileResponseDto?.ShopTelephone</td>
+                        <td>
+                            @if (vendor.IsActive && vendor.VendorProfileResponseDto?.Status == true)
+                            {
+                                <span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill">pending / inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-secondary me-3" style="cursor:pointer" @onclick="() => EditUser(vendor.Id)"></i>
+                            @if (!vendor.IsActive)
+                            {
+                                <i class="fas fa-user-check text-success me-2" style="cursor:pointer" @onclick="() => ActivateUser(vendor.Id)" title="Approve & activate"></i>
+                            }
+                            <i class="fas fa-trash-alt text-danger-light" style="cursor:pointer" @onclick="() => DeleteUser(vendor.Id)"></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <PaginationComponent PageNumber="@pagedResult.PageNumber"
+                         PageSize="@pagedResult.PageSize"
+                         TotalCount="@pagedResult.TotalCount"
+                         OnPageChanged="HandlePageChanged" />
+</div>
+
+@code {
+    PagedResultDto<UserResponseDto> pagedResult = new();
+    private List<ToastMessage> messages = new();
+    int pageNo = 1;
+    int pageSize = 10;
+
+    protected override async Task OnInitializedAsync() =>
+        await LoadingService.ExecuteAsync(LoadVendors);
+
+    async Task LoadVendors()
+    {
+        pagedResult = await _userService.GetUsersPagedAsync(UserRole.Vendor, pageNo, pageSize);
+    }
+
+    void GoToAddVendor() => navigationManager.NavigateTo("/Add-User?role=Vendor", true);
+    void EditUser(int id) => navigationManager.NavigateTo($"/Edit-User/{id}", true);
+
+    async Task HandlePageChanged(PaginationComponent.PaginationState state)
+    {
+        pageNo = state.PageNumber;
+        pageSize = state.PageSize;
+        await LoadingService.ExecuteAsync(LoadVendors);
+    }
+
+    async Task DeleteUser(int id) =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var response = await _userService.DeleteUserAsync(id);
+            ShowToast(response.Success, response.Data ?? response.Message);
+            if (response.Success) await LoadVendors();
+        });
+
+    async Task ActivateUser(int id) =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var response = await _userService.ActiveUser(id);
+            ShowToast(response.Success, response.Message);
+            if (response.Success) await LoadVendors();
+        });
+
+    void ShowToast(bool success, string? message)
+    {
+        messages.Add(new ToastMessage
+        {
+            Type = success ? ToastType.Success : ToastType.Danger,
+            Title = success ? "Success" : "Error",
+            Message = message ?? ""
+        });
+    }
+}

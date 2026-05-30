@@ -1,11 +1,13 @@
-﻿
-@inject LoadingService LoadingService
+﻿@inject LoadingService LoadingService
+@implements IDisposable
 
 @if (LoadingService.IsLoading)
 {
     <div class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Loading</p>
+        <div class="loading-card">
+            <div class="spinner"></div>
+            <p class="mb-0 mt-3">Please wait…</p>
+        </div>
     </div>
 }
 

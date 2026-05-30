@@ -52,11 +52,17 @@ namespace Hairlytics.Infrastructure.Repositories
         }
         
 
+        public async Task<int> GetUserCountAsync(UserRole userRole)
+        {
+            return await _context.Users.CountAsync(u => u.Role == userRole);
+        }
+
         public async Task<List<User>> GetUserListAsync(UserRole userRole, int pageNumber, int pageSize)
         {
             return await _context.Users
-                .Include(u => u.VendorProfile) 
-                .Where(u => u.Role == userRole && u.IsActive)
+                .Include(u => u.VendorProfile)
+                .Where(u => u.Role == userRole)
+                .OrderByDescending(u => u.UpdatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

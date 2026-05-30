@@ -20,6 +20,7 @@ option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection
 
 // add service and repository
 builder.Services.AddScoped<LoadingService>();
+builder.Services.AddScoped<AppSettingsFileService>();
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureRepository();
 builder.Services.AddHttpContextAccessor();
@@ -37,13 +38,15 @@ builder.Services.AddBlazorBootstrap();
 
 
 
+var sessionMinutes = builder.Configuration.GetValue<int>("AdminSettings:SessionTimeoutMinutes", 20);
+
 // Add Authentication
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.Cookie.Name = "AuthCookie";
-        options.Cookie.MaxAge = TimeSpan.FromMinutes(20);
+        options.Cookie.MaxAge = TimeSpan.FromMinutes(sessionMinutes);
         options.Cookie.HttpOnly = true;
         options.LoginPath = "/Admin/Login";
         options.AccessDeniedPath = "/Error";

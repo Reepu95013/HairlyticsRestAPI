@@ -8,6 +8,7 @@
 @inject IAuthService _authService
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject LoadingService LoadingService
 @rendermode InteractiveServer
 @* @inject UserRole userRole *@
 
@@ -77,8 +78,8 @@
                     <a @onclick="HandleForgotSwitch" type="button" class="forgot-link">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="btn-login" @onclick="OnClickLogin" disabled="@isLoading">
-                    @if (isLoading)
+                <button type="submit" class="btn-login" @onclick="OnClickLogin" disabled="@LoadingService.IsLoading">
+                    @if (LoadingService.IsLoading)
                     {
                         <span class="spinner-border spinner-border-sm"></span>
                     }
@@ -113,7 +114,6 @@
     };
 
 
-    private bool isLoading = false;
     private string? result { get; set; }
 
     private bool showForgotPassword { get; set; } = false;
@@ -131,57 +131,36 @@
     }   
 
 
-    private async Task OnClickLogin()
-    {
-        isLoading = true;
-        if (!string.IsNullOrWhiteSpace(login.Username) || !string.IsNullOrWhiteSpace(login.Password))
+    private async Task OnClickLogin() =>
+        await LoadingService.ExecuteAsync(async () =>
         {
-            var data = await _authService.LoginAdminAsync(login);
-            if (data != null)
-            {
-                if (data.Role == UserRole.Admin)
-                {
-                    var json = JsonSerializer.Serialize(data);
-                    var encoded = Uri.EscapeDataString(json);
-                    navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
-                }
-                else
-                {
-                    messages.Add(new ToastMessage
-                    {
-                        Type = ToastType.Danger,
-                        Title = "Failed",
-                        Message = "Invalid Username or Password!"
-                    });
-                }
-
-
-            }
-            else
+            if (string.IsNullOrWhiteSpace(login.Username) && string.IsNullOrWhiteSpace(login.Password))
             {
                 messages.Add(new ToastMessage
                 {
                     Type = ToastType.Danger,
                     Title = "Failed",
-                    Message = "Invalid Username or Password!"
+                    Message = "Username and Password is required!"
                 });
-
+                return;
             }
 
+            var data = await _authService.LoginAdminAsync(login);
+            if (data != null && data.Role == UserRole.Admin)
+            {
+                var json = JsonSerializer.Serialize(data);
+                var encoded = Uri.EscapeDataString(json);
+                navigationManager.NavigateTo($"/PostLogin?quary={encoded}");
+                return;
+            }
 
-        }
-        else
-        {
             messages.Add(new ToastMessage
             {
                 Type = ToastType.Danger,
                 Title = "Failed",
-                Message = "Username and Password is required!"
+                Message = "Invalid Username or Password!"
             });
-        }
-
-        isLoading = false;
-    }
+        });
 
 
 

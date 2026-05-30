@@ -37,6 +37,26 @@ namespace Hairlytics.Infrastructure.Repositories
                 .Where(x => x.Status).ToListAsync();
         }
 
+        public async Task<List<Service>> GetAllServicesAsync()
+        {
+            return await _context.Services
+                .Include(c => c.Category)
+                .OrderByDescending(x => x.UpdatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Service?> GetServiceByIdAsync(int serviceId)
+        {
+            return await _context.Services
+                .Include(c => c.Category)
+                .FirstOrDefaultAsync(x => x.Id == serviceId);
+        }
+
+        public async Task UpdateServiceAsync(Service service)
+        {
+            _context.Services.Update(service);
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<List<Service>> GetServicesByIdsAsync(List<int> serviceIds)
         {

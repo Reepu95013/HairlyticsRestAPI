@@ -1,0 +1,8 @@
+@attribute [Authorize]
+@page "/Services"
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+@code {
+    protected override void OnInitialized() => Navigation.NavigateTo("/Categories", replace: true);
+}

@@ -1,0 +1,286 @@
+@attribute [Authorize]
+@page "/Categories"
+@inject ICategoryServices _categoryService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject LoadingService LoadingService
+@rendermode InteractiveServer
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<div class="section-card">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="section-title mb-0"><i class="fas fa-shapes me-2" style="color:#d4a373;"></i> Categories</h4>
+        <button class="btn-outline-admin py-lg-2" @onclick="ShowAddForm">
+            <i class="fas fa-plus me-1"></i> Add category
+        </button>
+    </div>
+    <p class="text-secondary small">Admin and sub-admin can manage service categories and subcategories.</p>
+
+    @if (showForm)
+    {
+        <div class="border rounded-4 p-4 mb-4" style="background:#fafbfd;">
+            <h5 class="mb-3">@(editingId.HasValue ? "Edit category" : "New category")</h5>
+            <EditForm Model="@formModel" OnValidSubmit="SaveCategory">
+                <div class="row">
+                    <div class="col-md-6 form-row">
+                        <label class="form-label">Category name *</label>
+                        <div class="input-group-custom py-0 px-3">
+                            <input type="text" @bind="formModel.CategoryName" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6 form-row">
+                        <label class="form-label">Parent category</label>
+                        <select class="input-group-custom w-100 py-3 px-3" @bind="formModel.ParentCategoryId">
+                            <option value="0">None (top level)</option>
+                            @foreach (var parent in parentCategories)
+                            {
+                                @if (!editingId.HasValue || parent.Id != editingId)
+                                {
+                                    <option value="@parent.Id">@parent.CategoryName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12 form-row">
+                        <label class="form-label">Description *</label>
+                        <div class="input-group-custom py-0 px-3">
+                            <textarea rows="2" @bind="formModel.Description" required></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6 form-row">
+                        <label class="form-label">Image @(editingId.HasValue ? "(optional)" : "*")</label>
+                        <InputFile class="input-group-custom w-100 py-2 px-3" OnChange="OnImageSelected" />
+                    </div>
+                </div>
+                <div class="d-flex gap-3 mt-3">
+                    <button type="submit" class="btn-outline-admin py-lg-2"><i class="fas fa-save me-2"></i> Save</button>
+                    <button type="button" class="btn-outline-admin py-lg-2" @onclick="CancelForm"><i class="fas fa-times me-2"></i> Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-admin align-middle">
+            <thead>
+                <tr><th>Name</th><th>Description</th><th>Parent</th><th>Image</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                @if (pagedResult.Items.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-secondary py-4">No categories found.</td></tr>
+                }
+                @foreach (var cat in pagedResult.Items)
+                {
+                    <tr>
+                        <td class="fw-semibold">@cat.CategoryName</td>
+                        <td class="small text-secondary">@Truncate(cat.Description, 60)</td>
+                        <td>@GetParentName(cat.ParentCategoryId)</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(cat.Image))
+                            {
+                                <img src="@cat.Image" alt="" style="height:36px;width:36px;object-fit:cover;border-radius:8px;" />
+                            }
+                        </td>
+                        <td>
+                            <i class="fas fa-edit text-secondary me-3" style="cursor:pointer" @onclick="() => EditCategory(cat)"></i>
+                            <i class="fas fa-trash-alt text-danger-light" style="cursor:pointer" @onclick="() => DeleteCategory(cat.Id)"></i>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <PaginationComponent PageNumber="@pagedResult.PageNumber"
+                         PageSize="@pagedResult.PageSize"
+                         TotalCount="@pagedResult.TotalCount"
+                         OnPageChanged="HandlePageChanged" />
+</div>
+
+@code {
+    PagedResultDto<CategoryResponseDto> pagedResult = new();
+    List<CategoryResponseDto> parentCategories = new();
+    Dictionary<int, string> categoryNames = new();
+    private List<ToastMessage> messages = new();
+    bool showForm;
+    int? editingId;
+    IBrowserFile? selectedImage;
+    int adminUserId;
+    int pageNo = 1;
+    int pageSize = 10;
+    CategoryFormModel formModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (int.TryParse(userIdClaim, out var uid))
+            adminUserId = uid;
+
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            await LoadParentOptions();
+            await LoadCategories();
+        });
+    }
+
+    async Task LoadParentOptions()
+    {
+        var response = await _categoryService.GetCategoryListAsync();
+        if (response.Success && response.Data != null)
+        {
+            parentCategories = response.Data.Where(c => c.ParentCategoryId == null).ToList();
+            categoryNames = response.Data.ToDictionary(c => c.Id, c => c.CategoryName ?? "");
+        }
+    }
+
+    async Task LoadCategories()
+    {
+        var response = await _categoryService.GetCategoryListPagedAsync(pageNo, pageSize);
+        if (response.Success && response.Data != null)
+            pagedResult = response.Data;
+    }
+
+    async Task HandlePageChanged(PaginationComponent.PaginationState state)
+    {
+        pageNo = state.PageNumber;
+        pageSize = state.PageSize;
+        await LoadingService.ExecuteAsync(LoadCategories);
+    }
+
+    void ShowAddForm()
+    {
+        editingId = null;
+        formModel = new CategoryFormModel();
+        selectedImage = null;
+        showForm = true;
+    }
+
+    void EditCategory(CategoryResponseDto cat)
+    {
+        editingId = cat.Id;
+        formModel = new CategoryFormModel
+        {
+            CategoryName = cat.CategoryName ?? "",
+            Description = cat.Description ?? "",
+            ParentCategoryId = cat.ParentCategoryId ?? 0
+        };
+        selectedImage = null;
+        showForm = true;
+    }
+
+    void CancelForm()
+    {
+        showForm = false;
+        editingId = null;
+        selectedImage = null;
+    }
+
+    void OnImageSelected(InputFileChangeEventArgs e) => selectedImage = e.File;
+
+    async Task SaveCategory()
+    {
+        if (string.IsNullOrWhiteSpace(formModel.CategoryName) || string.IsNullOrWhiteSpace(formModel.Description))
+        {
+            ShowToast(false, "Name and description are required.");
+            return;
+        }
+
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var saved = false;
+            if (editingId.HasValue)
+            {
+                var updateDto = new CategoryUpdateDto
+                {
+                    Id = editingId.Value,
+                    CategoryName = formModel.CategoryName,
+                    Description = formModel.Description,
+                    ParentCategoryId = formModel.ParentCategoryId == 0 ? null : formModel.ParentCategoryId
+                };
+                if (selectedImage != null)
+                    updateDto.file = await ConvertToIFormFile(selectedImage);
+
+                var response = await _categoryService.UpdateCategoryAsync(updateDto);
+                ShowToast(response.Success, response.Message);
+                saved = response.Success;
+            }
+            else
+            {
+                if (selectedImage == null)
+                {
+                    ShowToast(false, "Please upload a category image.");
+                    return;
+                }
+
+                var createDto = new CategoryCreateDto
+                {
+                    CategoryName = formModel.CategoryName,
+                    Description = formModel.Description,
+                    ParentCategoryId = formModel.ParentCategoryId == 0 ? null : formModel.ParentCategoryId,
+                    UserId = adminUserId,
+                    file = await ConvertToIFormFile(selectedImage)
+                };
+                var response = await _categoryService.AddCategoryAsync(createDto);
+                ShowToast(response.Success, response.Message);
+                saved = response.Success;
+            }
+
+            if (saved)
+            {
+                CancelForm();
+                await LoadParentOptions();
+                await LoadCategories();
+            }
+        });
+    }
+
+    async Task DeleteCategory(int id) =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var response = await _categoryService.DeleteCategoryAsync(id);
+            ShowToast(response.Success, response.Message);
+            if (response.Success)
+            {
+                await LoadParentOptions();
+                await LoadCategories();
+            }
+        });
+
+    async Task<IFormFile> ConvertToIFormFile(IBrowserFile file)
+    {
+        var stream = file.OpenReadStream(10 * 1024 * 1024);
+        var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        ms.Position = 0;
+        return new FormFile(ms, 0, ms.Length, file.Name, file.Name)
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = file.ContentType
+        };
+    }
+
+    string GetParentName(int? parentId) =>
+        parentId == null ? "—" : categoryNames.GetValueOrDefault(parentId.Value, "—");
+
+    static string Truncate(string? text, int max) =>
+        string.IsNullOrEmpty(text) ? "" : text.Length <= max ? text : text[..max] + "…";
+
+    void ShowToast(bool success, string? message)
+    {
+        messages.Add(new ToastMessage
+        {
+            Type = success ? ToastType.Success : ToastType.Danger,
+            Title = success ? "Success" : "Error",
+            Message = message ?? ""
+        });
+    }
+
+    class CategoryFormModel
+    {
+        public string CategoryName { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int ParentCategoryId { get; set; }
+    }
+}

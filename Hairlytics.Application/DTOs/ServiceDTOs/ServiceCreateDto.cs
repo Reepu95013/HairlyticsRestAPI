@@ -1,10 +1,4 @@
-﻿using Hairlytics.Domain.Entities;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Hairlytics.Application.DTOs.ServiceDTOs
 {
@@ -17,9 +11,10 @@ namespace Hairlytics.Application.DTOs.ServiceDTOs
         public string? Image { get; set; }
         public required int Duration { get; set; }
         public required decimal Price { get; set; }
-        public decimal? OffPrice { get; set; } 
+        public decimal? OffPrice { get; set; }
         public required string Description { get; set; }
         public bool Status { get; set; }
-
-       }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
 }

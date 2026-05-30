@@ -115,6 +115,20 @@ namespace Hairlytics.Application.Services
             return users;
         }
 
+        public async Task<PagedResultDto<UserResponseDto>> GetUsersPagedAsync(UserRole userRole, int pageNumber, int pageSize)
+        {
+            var total = await _userRepository.GetUserCountAsync(userRole);
+            var users = await _userRepository.GetUserListAsync(userRole, pageNumber, pageSize);
+
+            return new PagedResultDto<UserResponseDto>
+            {
+                Items = _mapper.Map<List<UserResponseDto>>(users),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = total
+            };
+        }
+
         public async Task<ServiceResponse<string>> UpdateUserAsync(UserUpdateDto userUpdateDto)
         {
             var response = new ServiceResponse<string>();

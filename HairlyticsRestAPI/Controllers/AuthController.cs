@@ -1,5 +1,6 @@
 ﻿using Hairlytics.Application.DTOs.UserDTOs;
 using Hairlytics.Application.ServiceInterfaces;
+using Hairlytics.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,17 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
+
+        [Authorize(Roles = nameof(UserRole.Admin))]
+        [HttpPost("register-admin")]
+        public async Task<IActionResult> RegisterAdmin(UserCreateDto dto)
+        {
+            var result = await _authService.RegisterAdminAsync(dto);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserCreateDto dto)

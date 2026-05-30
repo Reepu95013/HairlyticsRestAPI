@@ -9,6 +9,7 @@ using Hairlytics.Application.DTOs.VendorDocumentDTOs;
 using Hairlytics.Application.DTOs.VendorProfileDTOs;
 using Hairlytics.Application.DTOs.VendorStaffDTOs;
 using Hairlytics.Application.DTOs.VendroGalleryDTOs;
+using Hairlytics.Application.Mapping.Configurations;
 using Hairlytics.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -81,24 +82,16 @@ namespace Hairlytics.Application.Mapping
 
 
             // =========================
-            // CATEGORY MAPPINGS
+            // CATEGORY MAPPINGS  →  DTOs/CategoryDTOs/
             // =========================
-            // create category DTO to Category 
-
-            CreateMap<CategoryCreateDto, Category>();
-            CreateMap<Category, CategoryResponseDto>();
+            CategoryMapConfiguration.Register(this);
 
 
 
             // =========================
-            // SERVICE MAPPINGS
+            // SERVICE MAPPINGS  →  DTOs/ServiceDTOs/
             // =========================
-            // create service DTO to entity  and entity to dto
-
-            CreateMap<ServiceCreateDto, Service>();
-            CreateMap<Service, ServiceResponseDto>()
-                .ForMember(dest => dest.CategoryResponseDto,
-                opt => opt.MapFrom(src => src.Category));
+            ServiceMapConfiguration.Register(this);
 
 
 

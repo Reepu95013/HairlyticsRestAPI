@@ -30,8 +30,6 @@ namespace HairlyticsRestAPI.Controllers
         {
             try
             {
-                var imagePath = await _fileService.SaveImage(categoryCreateDto.file, FolderNames.Category);
-                categoryCreateDto.Image = imagePath;
                 var response = await _categoryServices.AddCategoryAsync(categoryCreateDto);
                 if (response.Success)
                 {
@@ -56,6 +54,13 @@ namespace HairlyticsRestAPI.Controllers
 
 
         //[Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
+        [HttpGet("list/paged")]
+        public async Task<IActionResult> GetCategoriesPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var response = await _categoryServices.GetCategoryListPagedAsync(pageNumber, pageSize);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
         [HttpGet("list")]
         public async Task<IActionResult> GetCategories()
         {
@@ -90,6 +95,21 @@ namespace HairlyticsRestAPI.Controllers
         }
 
 
+
+        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
+        [HttpPost("update")]
+        public async Task<IActionResult> Update(CategoryUpdateDto categoryUpdateDto)
+        {
+            try
+            {
+                var response = await _categoryServices.UpdateCategoryAsync(categoryUpdateDto);
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
 
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.SubAdmin))]
         [HttpPost("delete/{id}")]

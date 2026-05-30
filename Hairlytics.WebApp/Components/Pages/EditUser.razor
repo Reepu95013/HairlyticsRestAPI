@@ -2,6 +2,7 @@
 @page "/Edit-User/{id:int}"
 @inject IUserService _userService
 @inject IFileService _fileService
+@inject LoadingService LoadingService
 @rendermode InteractiveServer
 
 
@@ -254,102 +255,65 @@
 
     protected override async Task OnInitializedAsync()
     {
-         if (_isLoaded) return;
+        if (_isLoaded) return;
 
-        var userData = await _userService.GetUserAsync(id); 
-        user = userData;
-
-        loadedUserData = new UserResponseDto
+        await LoadingService.ExecuteAsync(async () =>
         {
-            Id = userData.Id,
-            Name = userData.Name,
-            LastName = userData.LastName,
-            Email = userData.Email,
-            Username = userData.Username,
-            Password = userData.Password,
-            Phone = userData.Phone,
-            Birth = userData.Birth,
-            Role = userData.Role,
-
-            VendorProfileResponseDto = userData.VendorProfileResponseDto == null ? null : new VendorProfileResponseDto
+            var userData = await _userService.GetUserAsync(id);
+            user = userData;
+            loadedUserData = new UserResponseDto
             {
-                ShopName = userData.VendorProfileResponseDto.ShopName,
-                ShopTelephone = userData.VendorProfileResponseDto.ShopTelephone,
-                Description = userData.VendorProfileResponseDto.Description,
-                Address = userData.VendorProfileResponseDto.Address,
-                City = userData.VendorProfileResponseDto.City,
-                Region = userData.VendorProfileResponseDto.Region,
-                Country = userData.VendorProfileResponseDto.Country,
-                PostalCode = userData.VendorProfileResponseDto.PostalCode,
-                TaxNumber = userData.VendorProfileResponseDto.TaxNumber,
-                VendorDocumentResponseDto= userData.VendorProfileResponseDto.VendorDocumentResponseDto 
+                Id = userData.Id,
+                Name = userData.Name,
+                LastName = userData.LastName,
+                Email = userData.Email,
+                Username = userData.Username,
+                Password = userData.Password,
+                Phone = userData.Phone,
+                Birth = userData.Birth,
+                Role = userData.Role,
+                VendorProfileResponseDto = userData.VendorProfileResponseDto == null ? null : new VendorProfileResponseDto
+                {
+                    ShopName = userData.VendorProfileResponseDto.ShopName,
+                    ShopTelephone = userData.VendorProfileResponseDto.ShopTelephone,
+                    Description = userData.VendorProfileResponseDto.Description,
+                    Address = userData.VendorProfileResponseDto.Address,
+                    City = userData.VendorProfileResponseDto.City,
+                    Region = userData.VendorProfileResponseDto.Region,
+                    Country = userData.VendorProfileResponseDto.Country,
+                    PostalCode = userData.VendorProfileResponseDto.PostalCode,
+                    TaxNumber = userData.VendorProfileResponseDto.TaxNumber,
+                    VendorDocumentResponseDto = userData.VendorProfileResponseDto.VendorDocumentResponseDto
+                }
+            };
+            _isLoaded = true;
+        });
+    }
+
+
+    private async Task HandleUpdate() =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var updateDto = new UserUpdateDto { Id = user.Id, Role = user.Role };
+            if (user.Name != loadedUserData.Name) updateDto.Name = user.Name;
+            if (user.LastName != loadedUserData.LastName) updateDto.LastName = user.LastName;
+            if (user.Password != loadedUserData.Password) updateDto.Password = user.Password;
+            if (user.Birth != loadedUserData.Birth) updateDto.Birth = user.Birth;
+            if (user?.VendorProfileResponseDto != null &&
+                user.VendorProfileResponseDto.ShopName != loadedUserData.VendorProfileResponseDto?.ShopName)
+            {
+                updateDto.VendorProfileUpdateDto ??= new VendorProfileUpdateDto();
+                updateDto.VendorProfileUpdateDto.ShopName = user.VendorProfileResponseDto.ShopName;
             }
-        };
 
-        _isLoaded = true;
-
-    }
-
-
-    private async Task HandleUpdate()
-    {
-        var updateDto = new UserUpdateDto();
-
-        updateDto.Id = user.Id;
-        updateDto.Role = user.Role;
-
-        if (user.Name != loadedUserData.Name)
-            updateDto.Name = user.Name;
-
-        if (user.LastName != loadedUserData.LastName)
-            updateDto.LastName = user.LastName;
-
-        if (user.Password != loadedUserData.Password)
-            updateDto.Password = user.Password;
-
-        if (user.Birth != loadedUserData.Birth)
-            updateDto.Birth = user.Birth;
-
-
-        if (user?.VendorProfileResponseDto != null &&
-            user.VendorProfileResponseDto.ShopName != loadedUserData.VendorProfileResponseDto?.ShopName)
-        {
-           
-            updateDto.VendorProfileUpdateDto ??= new VendorProfileUpdateDto();
-            updateDto.VendorProfileUpdateDto.ShopName = user.VendorProfileResponseDto.ShopName;
-        }
-
-        
-
-
-        var response =  await _userService.UpdateUserAsync(updateDto);
-
-        if (response.Success)
-        {
+            var response = await _userService.UpdateUserAsync(updateDto);
             messages.Add(new ToastMessage
             {
-                Type = ToastType.Success,
-                Title = "Success!",
+                Type = response.Success ? ToastType.Success : ToastType.Danger,
+                Title = response.Success ? "Success!" : "Error!",
                 Message = response.Data
             });
-
-        }
-        else
-        {
-
-            messages.Add(new ToastMessage
-            {
-                Type = ToastType.Danger,
-                Title = "Error!",
-                Message = response.Data
-            });
-            
-            
-        }
-
-
-
-    }
+        });
 
 
 

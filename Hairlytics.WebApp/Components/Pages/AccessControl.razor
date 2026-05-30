@@ -1,0 +1,149 @@
+@attribute [Authorize]
+@page "/AccessControl"
+@inject IUserService _userService
+@inject NavigationManager navigationManager
+@inject LoadingService LoadingService
+@rendermode InteractiveServer
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<div class="row g-4 mb-4">
+    <div class="col-md-12">
+        <div class="section-card">
+            <div class="d-flex align-items-center justify-content-between">
+                <h4 class="section-title mb-0"><i class="fas fa-shield-alt me-2" style="color:#d4a373;"></i> Sub-admin access control</h4>
+                <button class="btn-outline-admin py-lg-2" @onclick="GoToAddSubAdmin">
+                    <i class="fas fa-user-plus me-1"></i> Add sub-admin
+                </button>
+            </div>
+            <p class="text-secondary small mt-2 mb-3">
+                Sub-admins can manage categories and vendor operations per API policy. Only platform admins can access this panel.
+            </p>
+            <div class="table-responsive">
+                <table class="table table-admin align-middle">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Username</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Access scope</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in pagedResult.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="avatar-sm">@(user.Name.Length > 0 ? user.Name[0] : '?')</span>
+                                        <div>@user.Name @user.LastName<br><small class="text-secondary">@user.Email</small></div>
+                                    </div>
+                                </td>
+                                <td>@user.Username</td>
+                                <td>@user.Phone</td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success-subtle text-success-emphasis px-3 py-2 rounded-pill">active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill">inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="feature-tag">categories</span>
+                                    <span class="feature-tag">vendors</span>
+                                    <span class="feature-tag">bookings</span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-edit text-secondary me-3" style="cursor:pointer" @onclick="() => EditUser(user.Id)"></i>
+                                    @if (!user.IsActive)
+                                    {
+                                        <i class="fas fa-user-check text-success me-2" style="cursor:pointer" @onclick="() => ActivateUser(user.Id)" title="Activate account"></i>
+                                    }
+                                    <i class="fas fa-trash-alt text-danger-light" style="cursor:pointer" @onclick="() => DeleteUser(user.Id)"></i>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <PaginationComponent PageNumber="@pagedResult.PageNumber"
+                                 PageSize="@pagedResult.PageSize"
+                                 TotalCount="@pagedResult.TotalCount"
+                                 OnPageChanged="HandlePageChanged" />
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h4 class="section-title"><i class="fas fa-key me-2" style="color:#d4a373;"></i> Role permissions matrix</h4>
+    <div class="table-responsive mt-3">
+        <table class="table table-admin">
+            <thead>
+                <tr><th>Capability</th><th>Admin</th><th>Sub-admin</th><th>Vendor</th><th>Customer</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Admin panel login</td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-times text-danger"></i></td><td><i class="fas fa-times text-danger"></i></td><td><i class="fas fa-times text-danger"></i></td></tr>
+                <tr><td>Manage sub-admins</td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-times text-danger"></i></td><td><i class="fas fa-times text-danger"></i></td><td><i class="fas fa-times text-danger"></i></td></tr>
+                <tr><td>Category CRUD (API)</td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-times text-danger"></i></td><td><i class="fas fa-times text-danger"></i></td></tr>
+                <tr><td>Vendor / booking management</td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-times text-danger"></i></td></tr>
+                <tr><td>Mobile app JWT login</td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-check text-success"></i></td><td><i class="fas fa-check text-success"></i></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    PagedResultDto<UserResponseDto> pagedResult = new();
+    private List<ToastMessage> messages = new();
+    int pageNo = 1;
+    int pageSize = 10;
+
+    protected override async Task OnInitializedAsync() =>
+        await LoadingService.ExecuteAsync(LoadSubAdmins);
+
+    async Task LoadSubAdmins()
+    {
+        pagedResult = await _userService.GetUsersPagedAsync(UserRole.SubAdmin, pageNo, pageSize);
+    }
+
+    void GoToAddSubAdmin() => navigationManager.NavigateTo("/Add-User?role=SubAdmin", true);
+    void EditUser(int id) => navigationManager.NavigateTo($"/Edit-User/{id}", true);
+
+    async Task HandlePageChanged(PaginationComponent.PaginationState state)
+    {
+        pageNo = state.PageNumber;
+        pageSize = state.PageSize;
+        await LoadingService.ExecuteAsync(LoadSubAdmins);
+    }
+
+    async Task DeleteUser(int id) =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var response = await _userService.DeleteUserAsync(id);
+            ShowToast(response.Success, response.Data ?? response.Message);
+            if (response.Success) await LoadSubAdmins();
+        });
+
+    async Task ActivateUser(int id) =>
+        await LoadingService.ExecuteAsync(async () =>
+        {
+            var response = await _userService.ActiveUser(id);
+            ShowToast(response.Success, response.Message);
+            if (response.Success) await LoadSubAdmins();
+        });
+
+    void ShowToast(bool success, string? message)
+    {
+        messages.Add(new ToastMessage
+        {
+            Type = success ? ToastType.Success : ToastType.Danger,
+            Title = success ? "Success" : "Error",
+            Message = message ?? ""
+        });
+    }
+}

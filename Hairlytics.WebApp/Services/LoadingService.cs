@@ -4,22 +4,47 @@
     {
         public event Action? OnChange;
 
-        private bool _isLoading;
+        private int _loadingCount;
 
-        public bool IsLoading
+        public bool IsLoading => _loadingCount > 0;
+
+        public void Show()
         {
-            get => _isLoading;
-            set
+            _loadingCount++;
+            OnChange?.Invoke();
+        }
+
+        public void Hide()
+        {
+            if (_loadingCount > 0)
+                _loadingCount--;
+            OnChange?.Invoke();
+        }
+
+        public async Task ExecuteAsync(Func<Task> action)
+        {
+            Show();
+            try
             {
-                if (_isLoading != value)
-                {
-                    _isLoading = value;
-                    OnChange?.Invoke(); // notify UI
-                }
+                await action();
+            }
+            finally
+            {
+                Hide();
             }
         }
 
-
+        public async Task<T> ExecuteAsync<T>(Func<Task<T>> action)
+        {
+            Show();
+            try
+            {
+                return await action();
+            }
+            finally
+            {
+                Hide();
+            }
+        }
     }
-
 }

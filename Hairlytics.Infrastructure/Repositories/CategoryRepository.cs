@@ -28,6 +28,12 @@ namespace Hairlytics.Infrastructure.Repositories
            await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateCategory(Category category)
+        {
+            _context.Category.Update(category);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task DeleteCategory(int categoryId)
         {
             var category = await _context.Category.FirstOrDefaultAsync(c => c.Id == categoryId && c.Status);
@@ -44,10 +50,24 @@ namespace Hairlytics.Infrastructure.Repositories
            return await _context.Category.Include(c => c.SubCategories).FirstOrDefaultAsync(c => c.Id == categoryId && c.Status);
         }
 
+        public async Task<int> GetCategoryCountAsync()
+        {
+            return await _context.Category.CountAsync(c => c.Status);
+        }
+
+        public async Task<List<Category>> GetCategoryList(int pageNumber, int pageSize)
+        {
+            return await _context.Category
+                .Where(c => c.Status)
+                .OrderByDescending(c => c.UpdatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
         public async Task<List<Category>> GetCategoryList()
         {
             return await _context.Category.Where(c => c.Status).ToListAsync();
-
         }
     }
 }

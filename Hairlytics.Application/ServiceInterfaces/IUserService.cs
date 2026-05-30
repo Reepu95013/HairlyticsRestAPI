@@ -16,6 +16,7 @@ namespace Hairlytics.Application.ServiceInterfaces
         Task<UserResponseDto> GetUserAsync(int UserId);
         Task<bool> CheckEmailExitsAsync(string email);
         Task<List<UserResponseDto>> GetUsersAsync(UserRole userRole, int pageNumber, int pageSize);
+        Task<PagedResultDto<UserResponseDto>> GetUsersPagedAsync(UserRole userRole, int pageNumber, int pageSize);
         Task<ServiceResponse<string>> UpdateUserAsync(UserUpdateDto userUpdateDto);
         Task<ServiceResponse<string>> DeleteUserAsync(int userId);
         Task<ServiceResponse<string>> ActiveUser(int userId);

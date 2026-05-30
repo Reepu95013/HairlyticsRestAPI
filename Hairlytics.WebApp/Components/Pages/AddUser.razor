@@ -10,7 +10,6 @@
 
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
-<LoaderComponent />
 <div class="page-header">
     <div class="header-title d-flex align-items-center">
         <h2><i class="fas fa-user-plus me-3" style="color:#d4a373;"></i>Add new user</h2>
@@ -253,6 +252,9 @@
 
 @code {
 
+    [SupplyParameterFromQuery(Name = "role")]
+    public string? RoleQuery { get; set; }
+
     private List<ToastMessage> messages = new();
 
     private UserCreateDto userCreateDto { get; set; } = new UserCreateDto
@@ -270,10 +272,32 @@
 
 
 
+    protected override void OnInitialized()
+    {
+        ApplyRoleFromQuery();
+    }
+
+    private void ApplyRoleFromQuery()
+    {
+        if (string.IsNullOrWhiteSpace(RoleQuery))
+            return;
+
+        if (Enum.TryParse<UserRole>(RoleQuery, ignoreCase: true, out var role) &&
+            role is UserRole.Customer or UserRole.Vendor or UserRole.SubAdmin)
+        {
+            userCreateDto.Role = role;
+            EnsureVendorProfileForRole();
+        }
+    }
+
     private void OnRoleChanged(ChangeEventArgs e)
     {
         userCreateDto.Role = Enum.Parse<UserRole>(e.Value!.ToString()!);
+        EnsureVendorProfileForRole();
+    }
 
+    private void EnsureVendorProfileForRole()
+    {
         if (userCreateDto.Role == UserRole.Vendor)
         {
             userCreateDto.VendorProfileCreateDto = new VendorProfileCreateDto
@@ -292,10 +316,10 @@
         }
         else
         {
-            // 🔥 Remove vendor data if role changed
             userCreateDto.VendorProfileCreateDto = null;
         }
     }
+
 
 
     private void AddDocument()
@@ -392,111 +416,48 @@
     }
 
 
-    private async Task HandleSubmit()
-    {
-        try
+    private async Task HandleSubmit() =>
+        await LoadingService.ExecuteAsync(async () =>
         {
-            LoadingService.IsLoading = true;
             if (userCreateDto.Role == UserRole.Vendor)
             {
-
                 var docs = userCreateDto.VendorProfileCreateDto?.VendorDocumentCreateDto;
-
                 if (docs == null || docs.Count < 3)
                 {
-                    messages.Add(new ToastMessage
-                    {
-                        Type = ToastType.Danger,
-                        Title = "Failed",
-                        Message = "Please add at least 3 documents"
-                    });
+                    messages.Add(new ToastMessage { Type = ToastType.Danger, Title = "Failed", Message = "Please add at least 3 documents" });
                     return;
                 }
-
-                // 🔥 Check empty fields inside documents
-                var invalidDocs = docs.Any(d =>
-                    string.IsNullOrWhiteSpace(d.DocumentType) ||
-                    d.FilePath == null || d.FilePath.Length == 0
-                );
-
+                var invalidDocs = docs.Any(d => string.IsNullOrWhiteSpace(d.DocumentType) || d.FilePath == null || d.FilePath.Length == 0);
                 if (invalidDocs)
                 {
-                    messages.Add(new ToastMessage
-                    {
-                        Type = ToastType.Danger,
-                        Title = "Failed",
-                        Message = "Please fill all document details and upload files"
-                    });
+                    messages.Add(new ToastMessage { Type = ToastType.Danger, Title = "Failed", Message = "Please fill all document details and upload files" });
                     return;
                 }
-
             }
 
-
-
             var userpassword = userCreateDto.Password;
-
-            var response =  await _authService.RegisterUserAsync(userCreateDto);
+            var response = await _authService.RegisterAdminAsync(userCreateDto);
 
             if (response.Success)
             {
-                messages.Add(new ToastMessage
-                {
-                    Type = ToastType.Success,
-                    Title = "Success!",
-                    Message = response.Message
-                });
-
-
+                messages.Add(new ToastMessage { Type = ToastType.Success, Title = "Success!", Message = response.Message });
                 if (userCreateDto.Role == UserRole.Vendor)
                 {
-                    var mail = new EmailDto
-                      (
-                          userCreateDto.Email,
-                          "No Reply",
-                          EmailBody.EmailStringBody($"Your account has been created successfully. Your username is {userCreateDto.Username} and password is {userpassword}. Please wait for admin approval. Once your account is approved, you will be notified.")
-                      );
-
-                    _emailService.SendEmail(mail);
+                    _emailService.SendEmail(new EmailDto(userCreateDto.Email, "No Reply",
+                        EmailBody.EmailStringBody($"Your account has been created successfully. Your username is {userCreateDto.Username} and password is {userpassword}. Please wait for admin approval.")));
                 }
                 else
                 {
-                    var mail = new EmailDto
-                     (
-                         userCreateDto.Email,
-                         "No Reply",
-                         EmailBody.EmailStringBody($"Your Account has been created successfuly, and your username is {userCreateDto.Username} and password is {userpassword} .")
-
-                     );
-
-                    _emailService.SendEmail(mail);                    
-                }               
-
+                    _emailService.SendEmail(new EmailDto(userCreateDto.Email, "No Reply",
+                        EmailBody.EmailStringBody($"Your Account has been created successfuly, and your username is {userCreateDto.Username} and password is {userpassword} .")));
+                }
                 ClearForm();
-
             }
             else
             {
-                messages.Add(new ToastMessage
-                {
-                    Type = ToastType.Danger,
-                    Title = "Failed",
-                    Message = response.Message
-                });
+                messages.Add(new ToastMessage { Type = ToastType.Danger, Title = "Failed", Message = response.Message });
             }
-
-        }catch(Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-
-        }
-        finally
-        {
-            LoadingService.IsLoading = false;
-        }
-
-   
-    }
+        });
 
 
 }
