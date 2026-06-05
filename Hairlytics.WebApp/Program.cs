@@ -1,10 +1,12 @@
 using Hairlytics.Application.ApplicationHelper;
 using Hairlytics.Application.Mapping;
+using Hairlytics.Domain.Enums;
 using Hairlytics.Infrastructure.Database;
 using Hairlytics.Infrastructure.Extensions;
 using Hairlytics.WebApp.Components;
 using Hairlytics.WebApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
@@ -53,7 +55,18 @@ builder.Services
     });
 
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole(
+            nameof(UserRole.Admin),
+            nameof(UserRole.SubAdmin));
+    });
+});
+
+
 builder.Services.AddCascadingAuthenticationState();
 
 
@@ -68,8 +81,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-//app.UseStaticFiles();
 
 
 //var basePath = builder.Configuration["FileStorage:BasePath"];

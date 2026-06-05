@@ -1,4 +1,5 @@
 ﻿@page "/PostLogin"
+@attribute [AllowAnonymous]
 @inject NavigationManager navigationManager;
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IAuthService _authService
@@ -26,6 +27,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("PostLogin reached");
 
         if (string.IsNullOrEmpty(quary))
         {
@@ -63,7 +65,7 @@
 
                 await httpContext!.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                navigationManager.NavigateTo("/");
+                navigationManager.NavigateTo("/", forceLoad: true);
 
             }
             else

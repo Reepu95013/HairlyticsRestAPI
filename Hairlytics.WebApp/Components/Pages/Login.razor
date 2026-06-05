@@ -1,4 +1,5 @@
 ﻿@page "/Admin/Login"
+@attribute [AllowAnonymous]
 @using Hairlytics.Application.DTOs.UserDTOs
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
@@ -128,20 +129,21 @@
         {
             navigationManager.NavigateTo("/", true);
         }
-    }   
+    }
 
 
-    private async Task OnClickLogin() =>
+    private async Task OnClickLogin()
+    {       
         await LoadingService.ExecuteAsync(async () =>
         {
             if (string.IsNullOrWhiteSpace(login.Username) && string.IsNullOrWhiteSpace(login.Password))
             {
                 messages.Add(new ToastMessage
-                {
-                    Type = ToastType.Danger,
-                    Title = "Failed",
-                    Message = "Username and Password is required!"
-                });
+                    {
+                        Type = ToastType.Danger,
+                        Title = "Failed",
+                        Message = "Username and Password is required!"
+                    });
                 return;
             }
 
@@ -155,12 +157,14 @@
             }
 
             messages.Add(new ToastMessage
-            {
-                Type = ToastType.Danger,
-                Title = "Failed",
-                Message = "Invalid Username or Password!"
-            });
+                {
+                    Type = ToastType.Danger,
+                    Title = "Failed",
+                    Message = "Invalid Username or Password!"
+                });
         });
+
+    }
 
 
 
@@ -169,10 +173,6 @@
         showForgotPassword = !showForgotPassword;
 
     }
-
-
-
-
 
 
 }
