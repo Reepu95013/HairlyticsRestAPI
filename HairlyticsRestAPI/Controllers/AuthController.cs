@@ -49,7 +49,7 @@ namespace HairlyticsRestAPI.Controllers
         {
            var tokenData =  await _authService.LoginUserAsync(loginDto.Username, loginDto.Password);
             if (tokenData.Success==false)
-                return Unauthorized(tokenData.Message);
+                return BadRequest(tokenData.Message);
 
             return Ok(tokenData);
         }
