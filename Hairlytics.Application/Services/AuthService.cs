@@ -92,13 +92,14 @@ namespace Hairlytics.Application.Services
 
             // check user exit or not
             var user = await _authRepository.GetByUsernameAsync(username);
-            if (user == null)
+            if (user == null || user.IsActive == false)
             {
                 response.Message = "Username or Password is incorrect!";
                 response.Success = false;
             }
             else
             {
+                
 
                 // verify password
                 bool isPasswordCorrect = _passwordHasher.VerifyPassword(password, user.Password);
