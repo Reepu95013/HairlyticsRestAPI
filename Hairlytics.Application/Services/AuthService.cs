@@ -7,16 +7,9 @@ using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Entities;
 using Hairlytics.Domain.Enums;
 using Hairlytics.Domain.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Org.BouncyCastle.Utilities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using Twilio.Http;
+
 
 namespace Hairlytics.Application.Services
 {
@@ -497,7 +490,7 @@ namespace Hairlytics.Application.Services
             if (emailexit)
             {
                 response.Success = false;
-                response.Message = "Email already exists , try with another eamil!";
+                response.Message = "Email already exists , try with another email!";
                 return response;
             }
 
@@ -633,17 +626,136 @@ namespace Hairlytics.Application.Services
             return response;
         }
 
+
+        private string GenerateOtp()
+        {
+            return Random.Shared.Next(100000, 1000000).ToString();
+        }
+
+        public async Task<ServiceResponse<string>> SendEmailVerificationOtp(string email)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+
+                bool result = Helper.IsValidEmail(email);
+                if (!result)
+                {
+                    response.Success = false;
+                    response.Message = "Please enter valid email address!";
+                    return response;
+
+                }
+              
+                var data = await _authRepository.CheckEmailVarificationExitAsync(email);
+                bool registeredEmail = await _authRepository.IsExitsEmailAsync(email);
+
+                if (registeredEmail)
+                {
+                    response.Success = false;
+                    response.Message = "Email already used, please use another email!";
+                    return response;
+                }
+
+                var otp = GenerateOtp();
+                if (data != null) {
+                    data.Otp = otp;
+                    data.ExpiryTime = DateTime.Now.AddMinutes(10);
+                    data.UpdatedAt = DateTime.Now;
+
+                }
+                else
+                {
+
+                    var emailVarificationOtp = new EmailVerification()
+                    {
+                        Email = email,
+                        Otp = otp,
+                        IsVerified = false,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        ExpiryTime = DateTime.Now.AddMinutes(10)                        
+
+                    };
+
+                  await _authRepository.AddEmailVarificationOtpAsync(emailVarificationOtp);
+
+                }
+
+                await _authRepository.SaveChangesAsync();
+
+                var mail = new EmailDto
+                 (
+                    email,
+                    "Forgot Password",
+                     EmailBody.EmailStringBody($"Your OTP is {otp}. It is valid for 10 minutes.")
+
+                   );
+                _emailService.SendEmail(mail);
+
+                response.Success = true;
+                response.Message = "OTP has been sent on your email!";
+
+                return response;
+               
+            }
+            catch (Exception ex)
+            {
+
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+
+            }
+           
+        }
+
+
+        public async Task<ServiceResponse<string>> VerifyOtp (VerifyEmailOtpDto verifyEmailOtpDto)
+        {
+            var response = new ServiceResponse<string>();
+            try
+            {
+                var data = await _authRepository.CheckEmailVarificationExitAsync(verifyEmailOtpDto.Email);
+
+                if (data != null)
+                {
+                    if(data.Otp == verifyEmailOtpDto.Otp && data.ExpiryTime > DateTime.Now)
+                    {
+                        data.IsVerified = true;
+                        await  _authRepository.SaveChangesAsync();
+                        response.Success = true;
+                        response.Message = "OTP verified successfully!";
+                    }
+                    else
+                    {
+                        response.Success = false;
+                        response.Message = "Time expaired or OTP mismatch";
+
+                    }
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Email not found!";
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = "Failed";
+                response.Data = ex.Message;
+                return response;
+            }
+        }
         //public async Task LogoutAsync()
         //{
         //    //await _httpContextAccessor.HttpContext.SignOutAsync(
         //    //CookieAuthenticationDefaults.AuthenticationScheme);
         //    await
         //}
-
-
-
-
-
 
 
     }

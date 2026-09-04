@@ -10,5 +10,7 @@ namespace Hairlytics.Application.ServiceInterfaces
     public interface IEmailService
     {
         void SendEmail(EmailDto emailDto);
+
+       
     }
 }

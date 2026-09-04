@@ -3,6 +3,7 @@ using Hairlytics.Application.ServiceInterfaces;
 using Hairlytics.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -113,6 +114,32 @@ namespace HairlyticsRestAPI.Controllers
         public async Task<IActionResult> RegisterPhoneNumber(string phoneNumber)
         {
             var data = await _authService.SendPhoneOtp(phoneNumber);
+            if (data.Success == false)
+            {
+                return BadRequest(data.Message);
+            }
+
+            return Ok(data);
+        }
+
+        [HttpPost("send/email-otp/{email}")]
+        public async Task<IActionResult> EmailVarificationSendOtp(string email)
+        {
+           var data  = await _authService.SendEmailVerificationOtp(email);
+
+            if (data.Success == false)
+            {
+                return BadRequest(data.Message);
+            }
+
+            return Ok(data);
+        }
+
+        [HttpPost("verify/email-otp")]
+        public async Task<IActionResult> EmailVerificationVerifyOtp([FromForm] VerifyEmailOtpDto verifyEmailOtpDto)
+        {
+            var data = await _authService.VerifyOtp(verifyEmailOtpDto);
+
             if (data.Success == false)
             {
                 return BadRequest(data.Message);

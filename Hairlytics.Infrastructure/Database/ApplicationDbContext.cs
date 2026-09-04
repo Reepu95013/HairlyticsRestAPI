@@ -36,6 +36,7 @@ namespace Hairlytics.Infrastructure.Database
         public DbSet<BookedService> BookedServices { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<RegisterPhoneNumber> RegisterPhoneNumbers { get; set; }
+        public DbSet<EmailVerification> EmailVerifications { get; set; }
 
 
 

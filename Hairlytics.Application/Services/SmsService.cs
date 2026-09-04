@@ -15,7 +15,7 @@ namespace Hairlytics.Application.Services
     {
 
         private readonly string accountSid = "ACe04f68b03e55b659ca035d1ff27d538d";
-        private readonly string authToken = "20da39cfe1ddace66a5eeb388c7a372e";
+        private readonly string authToken = "11c493135dc2258688d74ffbe254265a";
         private readonly string twilioPhoneNumber = "+17542915154";
 
         public async Task SendOtpSms(string phoneNumber, string otp)

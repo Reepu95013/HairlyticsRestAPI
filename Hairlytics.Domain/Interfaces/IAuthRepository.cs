@@ -20,5 +20,10 @@ namespace Hairlytics.Domain.Interfaces
         Task ForgotPassword(ForgotPassword forgotPassword);
         Task<ForgotPassword?> GetResetPasswordData(string email);
         Task RegisterPhoneNumber(RegisterPhoneNumber registerPhoneNumber);
+        Task<EmailVerification?> CheckEmailVarificationExitAsync(string email);
+        Task AddEmailVarificationOtpAsync(EmailVerification emailVerification);
+       
+       
+
     }
 }

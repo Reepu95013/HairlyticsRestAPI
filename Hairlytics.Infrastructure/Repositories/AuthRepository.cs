@@ -134,5 +134,18 @@ namespace Hairlytics.Infrastructure.Repositories
             await _context.SaveChangesAsync();
 
         }
+
+        public async Task<EmailVerification?> CheckEmailVarificationExitAsync(string email)
+        {
+           return await _context.EmailVerifications.FirstOrDefaultAsync(x => x.Email == email);
+           
+        }
+        public async Task AddEmailVarificationOtpAsync(EmailVerification emailVerification)
+        {
+            await _context.EmailVerifications.AddAsync(emailVerification);
+
+        }
+
+        
     }
 }
